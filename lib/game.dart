@@ -1,23 +1,31 @@
 import 'package:flame/game.dart';
+import 'package:flame/input.dart';
+import 'package:flutter/material.dart' show KeyEventResult;
+import 'package:flutter/services.dart' show LogicalKeyboardKey;
+import 'package:flutter/widgets.dart' show KeyEvent;
 import 'package:flutter_tank_war/tank/enemy_tank.dart';
 import 'package:flutter_tank_war/tank/hero_tank.dart';
-import 'package:flutter_tank_war/tank/tank.dart';
 
-class Game extends FlameGame {
-  Tank? heroTank;
+class Game extends FlameGame with KeyboardEvents {
+  HeroTank? heroTank;
 
   @override
   void onLoad() async {
-    super.onLoad();
-    add(heroTank = EnemyTank()..position = Vector2.all(200));
-    add(heroTank = EnemyTank()..position = Vector2.all(400));
-    add(heroTank = EnemyTank()..position = Vector2.all(500));
-    add(heroTank = EnemyTank()..position = Vector2.all(300));
-    add(heroTank = EnemyTank()..position = Vector2.all(600));
-    add(heroTank = EnemyTank()..position = Vector2.all(700));
-    add(heroTank = EnemyTank()..position = Vector2.all(550));
-    add(heroTank = EnemyTank()..position = Vector2.all(150));
-    add(heroTank = EnemyTank()..position = Vector2.all(260));
-    add(heroTank = HeroTank()..position = Vector2.all(100));
+    List.generate(
+      10,
+      (index) => add(EnemyTank()..position = Vector2.all(index * 100)),
+    );
+    add(heroTank = HeroTank()..position = Vector2.all(300));
+  }
+
+  @override
+  KeyEventResult onKeyEvent(
+    KeyEvent event,
+    Set<LogicalKeyboardKey> keysPressed,
+  ) {
+    if (heroTank?.handleKeyEvent(event, keysPressed) == true) {
+      return KeyEventResult.handled;
+    }
+    return super.onKeyEvent(event, keysPressed);
   }
 }

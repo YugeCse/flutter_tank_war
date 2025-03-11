@@ -4,14 +4,13 @@ enum MoveDirection {
   up(0),
   right(1),
   down(2),
-  left(3),
-  none(-1);
+  left(3);
 
   final int value;
 
   const MoveDirection(this.value);
 
-  static const List<MoveDirection> all = [up, down, left, right, none];
+  static const List<MoveDirection> all = [up, down, left, right];
 }
 
 extension MoveDirectionExtension on MoveDirection {
@@ -25,8 +24,6 @@ extension MoveDirectionExtension on MoveDirection {
         return Vector2(-1, 0);
       case MoveDirection.right:
         return Vector2(1, 0);
-      case MoveDirection.none:
-        return Vector2(0, 0);
     }
   }
 }
