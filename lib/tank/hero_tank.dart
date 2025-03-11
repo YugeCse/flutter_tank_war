@@ -42,26 +42,34 @@ class HeroTank extends Tank {
         fire();
         return true;
       }
-      if (keysPressed.contains(LogicalKeyboardKey.arrowUp) ||
-          keysPressed.contains(LogicalKeyboardKey.keyW)) {
+      if ([
+        LogicalKeyboardKey.arrowUp,
+        LogicalKeyboardKey.keyW,
+      ].contains(event.logicalKey)) {
         _canMove = true;
         moveDirection = MoveDirection.up;
         currentTankCells = getTankCell(moveDirection);
         return true;
-      } else if (keysPressed.contains(LogicalKeyboardKey.arrowRight) ||
-          keysPressed.contains(LogicalKeyboardKey.keyD)) {
+      } else if ([
+        LogicalKeyboardKey.arrowRight,
+        LogicalKeyboardKey.keyD,
+      ].contains(event.logicalKey)) {
         _canMove = true;
         moveDirection = MoveDirection.right;
         currentTankCells = getTankCell(moveDirection);
         return true;
-      } else if (keysPressed.contains(LogicalKeyboardKey.arrowDown) ||
-          keysPressed.contains(LogicalKeyboardKey.keyS)) {
+      } else if ([
+        LogicalKeyboardKey.arrowDown,
+        LogicalKeyboardKey.keyS,
+      ].contains(event.logicalKey)) {
         _canMove = true;
         moveDirection = MoveDirection.down;
         currentTankCells = getTankCell(moveDirection);
         return true;
-      } else if (keysPressed.contains(LogicalKeyboardKey.arrowLeft) ||
-          keysPressed.contains(LogicalKeyboardKey.keyA)) {
+      } else if ([
+        LogicalKeyboardKey.arrowLeft,
+        LogicalKeyboardKey.keyA,
+      ].contains(event.logicalKey)) {
         _canMove = true;
         moveDirection = MoveDirection.left;
         currentTankCells = getTankCell(moveDirection);
