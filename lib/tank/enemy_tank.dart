@@ -3,6 +3,7 @@ import 'dart:math' show Random;
 
 import 'package:flame/components.dart' show TimerComponent;
 import 'package:flutter_tank_war/data/move_direction.dart';
+import 'package:flutter_tank_war/tank/bullet.dart';
 import 'package:flutter_tank_war/tank/tank.dart';
 
 class EnemyTank extends Tank {
@@ -26,7 +27,7 @@ class EnemyTank extends Tank {
         onTick: () {
           randomAutoMove(); // 随机移动
           if ((Random().nextInt(1000) + 1) % 5 == 0) {
-            fire(); // 射击
+            fire(ownerType: Bullet.typeOfEnemyBullet); // 射击
           }
         },
       ),

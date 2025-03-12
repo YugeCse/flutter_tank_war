@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart'
     show KeyDownEvent, KeyUpEvent, LogicalKeyboardKey;
 import 'package:flutter_tank_war/data/move_direction.dart';
+import 'package:flutter_tank_war/tank/bullet.dart';
 import 'package:flutter_tank_war/tank/tank.dart';
 
 class HeroTank extends Tank {
@@ -15,15 +16,15 @@ class HeroTank extends Tank {
     [0, 1, 1, 1, 1, 2, 0, 1, 1], //左
   ];
 
-  final Set<LogicalKeyboardKey> _pressedKeys = {};
+  /// 玩家按下的键
+  final Set<LogicalKeyboardKey> _playerPressedKeys = {};
 
-  bool _isKeysPressed(Set<LogicalKeyboardKey> keys) {
-    return _pressedKeys.intersection(keys).length > 1;
-  }
+  /// 判断玩家是否按下了某些键
+  bool _isKeysPressed(Set<LogicalKeyboardKey> keys) =>
+      _playerPressedKeys.intersection(keys).isNotEmpty;
 
   @override
   FutureOr<void> onLoad() async {
-    debugPrint('创建了英雄坦克 $position, $size');
     currentTankCells = getTankCell(MoveDirection.up);
   }
 
@@ -63,25 +64,24 @@ class HeroTank extends Tank {
     if (event is KeyDownEvent) {
       if (event.logicalKey == LogicalKeyboardKey.keyJ ||
           event.logicalKey == LogicalKeyboardKey.keyK) {
-        fire();
+        fire(ownerType: Bullet.typeOfHeroBullet);
         return true;
       }
       if (keysPressed.intersection({
-            LogicalKeyboardKey.keyW,
-            LogicalKeyboardKey.keyA,
-            LogicalKeyboardKey.keyS,
-            LogicalKeyboardKey.keyD,
-            LogicalKeyboardKey.arrowUp,
-            LogicalKeyboardKey.arrowLeft,
-            LogicalKeyboardKey.arrowDown,
-            LogicalKeyboardKey.arrowRight,
-          }).length ==
-          1) {
-        _pressedKeys.addAll(keysPressed); // 添加按下的键
+        LogicalKeyboardKey.keyW,
+        LogicalKeyboardKey.keyA,
+        LogicalKeyboardKey.keyS,
+        LogicalKeyboardKey.keyD,
+        LogicalKeyboardKey.arrowUp,
+        LogicalKeyboardKey.arrowLeft,
+        LogicalKeyboardKey.arrowDown,
+        LogicalKeyboardKey.arrowRight,
+      }).isNotEmpty) {
+        _playerPressedKeys.addAll(keysPressed); // 添加按下的键
         return true;
       }
     } else if (event is KeyUpEvent) {
-      _pressedKeys.remove(event.logicalKey); // 移除松开的键
+      _playerPressedKeys.remove(event.logicalKey); // 移除松开的键
     }
     return false;
   }

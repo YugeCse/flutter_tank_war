@@ -13,17 +13,17 @@ class Game extends FlameGame with KeyboardEvents {
 
   @override
   void onLoad() async {
-    List.generate(
-      10,
-      (index) => add(EnemyTank()..position = Vector2.all(index * 100)),
-    );
+    // List.generate(
+    //   10,
+    //   (index) => add(EnemyTank()..position = Vector2.all(index * 100)),
+    // );
     add(heroTank = HeroTank()..position = Vector2.all(300));
   }
 
   @override
   void render(Canvas canvas) {
+    canvas.drawColor(Colors.grey[200]!, BlendMode.clear);
     super.render(canvas);
-    canvas.drawColor(Colors.grey[300]!, BlendMode.color);
   }
 
   @override

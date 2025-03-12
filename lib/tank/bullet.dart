@@ -6,20 +6,28 @@ import 'package:flutter/widgets.dart' show debugPrint;
 import 'package:flutter_tank_war/data/move_direction.dart';
 import 'package:flutter_tank_war/game.dart' show Game;
 import 'package:flutter_tank_war/tank/enemy_tank.dart';
-import 'package:flutter_tank_war/tank/hero_tank.dart';
 import 'package:flutter_tank_war/tank/tank.dart' show Tank;
 import 'package:flutter_tank_war/utils/canvas_utils.dart';
 
+/// 子弹组件
 class Bullet extends PositionComponent with HasGameRef<Game> {
+  static final int typeOfHeroBullet = 0;
+
+  static final int typeOfEnemyBullet = 1;
+
   Bullet({
     super.size,
     super.position,
-    required this.owner,
+    required this.ownerType,
     required this.moveDirection,
+    this.speed = 100,
   });
 
-  /// 子弹的拥有者
-  final Tank owner;
+  /// 子弹的拥有者类型
+  final int ownerType;
+
+  /// 子弹速度, 默认：100
+  double speed;
 
   /// 子弹移动方向
   final MoveDirection moveDirection;
@@ -31,7 +39,7 @@ class Bullet extends PositionComponent with HasGameRef<Game> {
       col: 0,
       row: 0,
       cellSize: Tank.gridSize,
-      renderColor: Colors.redAccent,
+      renderColor: Colors.black,
     );
   }
 
@@ -78,13 +86,13 @@ class Bullet extends PositionComponent with HasGameRef<Game> {
       var allBullet = gameRef.children.whereType<Bullet>();
       for (var bullet in allBullet) {
         if (bullet != this &&
-            bullet.owner != owner &&
+            bullet.ownerType != ownerType &&
             bullet.isCollideWith(this)) {
           removeFromParent();
           bullet.removeFromParent();
         }
       }
-      if (owner is HeroTank) {
+      if (ownerType == typeOfHeroBullet) {
         var allEnemyTanks = gameRef.children.whereType<EnemyTank>();
         for (var enemyTank in allEnemyTanks) {
           if (isCollideWithTank(enemyTank)) {
@@ -93,7 +101,7 @@ class Bullet extends PositionComponent with HasGameRef<Game> {
           }
         }
       }
-      position += moveDirection.vector * dt * 100;
+      position += moveDirection.vector * dt * speed;
     }
   }
 }

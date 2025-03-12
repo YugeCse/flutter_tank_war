@@ -48,6 +48,7 @@ abstract class Tank extends PositionComponent with HasGameRef<Game> {
     ).nextInt(MoveDirection.all.length)];
   }
 
+  /// 判断是否与另一个坦克碰撞
   bool isCollideWithTank(Tank tank) {
     var otherRect = Rect.fromLTWH(
       tank.position.x,
@@ -63,18 +64,20 @@ abstract class Tank extends PositionComponent with HasGameRef<Game> {
     ).overlaps(otherRect);
   }
 
-  void fire() {
-    Vector2 adjustVector = Vector2(1, 1);
-    if (moveDirection == MoveDirection.up) {
-      adjustVector = Vector2(1, -1);
-    }
+  /// 开火、开炮
+  /// - [ownerType] 开火者类型, [Bullet.typeOfEnemyBullet], [Bullet.typeOfHeroBullet]
+  /// - [speed] 子弹速度, 默认：100
+  void fire({required int ownerType, double speed = 100}) {
+    Vector2 adjustVector =
+        moveDirection == MoveDirection.up ? Vector2(1, -1) : Vector2(1, 1);
     gameRef.add(
       Bullet(
-        owner: this,
+        ownerType: ownerType,
+        speed: speed,
+        moveDirection: moveDirection,
         size: Vector2.all(Tank.gridSize),
         position: position + adjustVector * Tank.gridSize,
-        moveDirection: moveDirection,
-      )..debugMode = true,
+      ),
     );
   }
 
