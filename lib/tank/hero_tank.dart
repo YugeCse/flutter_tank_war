@@ -5,10 +5,12 @@ import 'package:flutter/services.dart'
     show KeyDownEvent, KeyUpEvent, LogicalKeyboardKey;
 import 'package:flutter_tank_war/data/move_direction.dart';
 import 'package:flutter_tank_war/tank/bullet.dart';
-import 'package:flutter_tank_war/tank/tank.dart';
+import 'package:flutter_tank_war/tank/base_tank.dart';
 
-class HeroTank extends Tank {
-  HeroTank({super.position, super.size});
+/// 玩家坦克
+class HeroTank extends BaseTank {
+  /// 构造方法
+  HeroTank({super.position});
 
   @override
   List<List<int>> tankCells = [

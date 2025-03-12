@@ -4,9 +4,10 @@ import 'dart:math' show Random;
 import 'package:flame/components.dart' show TimerComponent;
 import 'package:flutter_tank_war/data/move_direction.dart';
 import 'package:flutter_tank_war/tank/bullet.dart';
-import 'package:flutter_tank_war/tank/tank.dart';
+import 'package:flutter_tank_war/tank/base_tank.dart';
 
-class EnemyTank extends Tank {
+/// 敌方坦克
+class EnemyTank extends BaseTank {
   @override
   List<List<int>> tankCells = [
     [0, 1, 0, 1, 1, 1, 1, 0, 1], //上
@@ -38,7 +39,7 @@ class EnemyTank extends Tank {
   void randomAutoMove() {
     moveDirection = generateRandomDirection(); // 随机方向
     currentTankCells = getTankCell(moveDirection);
-    position += moveDirection.vector * Tank.gridSize; // 移动坦克
+    position += moveDirection.vector * BaseTank.gridSize; // 移动坦克
   }
 
   @override

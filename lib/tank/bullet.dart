@@ -6,15 +6,18 @@ import 'package:flutter/widgets.dart' show debugPrint;
 import 'package:flutter_tank_war/data/move_direction.dart';
 import 'package:flutter_tank_war/game.dart' show Game;
 import 'package:flutter_tank_war/tank/enemy_tank.dart';
-import 'package:flutter_tank_war/tank/tank.dart' show Tank;
+import 'package:flutter_tank_war/tank/base_tank.dart' show BaseTank;
 import 'package:flutter_tank_war/utils/canvas_utils.dart';
 
 /// 子弹组件
 class Bullet extends PositionComponent with HasGameRef<Game> {
+  /// Hero的子弹
   static final int typeOfHeroBullet = 0;
 
+  /// 敌人的子弹
   static final int typeOfEnemyBullet = 1;
 
+  /// 构造方法
   Bullet({
     super.size,
     super.position,
@@ -38,11 +41,12 @@ class Bullet extends PositionComponent with HasGameRef<Game> {
     canvas.drawCell(
       col: 0,
       row: 0,
-      cellSize: Tank.gridSize,
+      cellSize: BaseTank.gridSize,
       renderColor: Colors.black,
     );
   }
 
+  /// 与子弹发生碰撞
   bool isCollideWith(Bullet bullet) {
     return Rect.fromLTWH(
       bullet.position.x,
@@ -52,19 +56,20 @@ class Bullet extends PositionComponent with HasGameRef<Game> {
     ).overlaps(Rect.fromLTWH(position.x, position.y, size.x, size.y));
   }
 
-  bool isCollideWithTank(Tank tank) {
+  /// 与坦克发生碰撞
+  bool isCollideWithTank(BaseTank tank) {
     List<Rect> rectList = [];
     for (var i = 0; i < tank.currentTankCells.length; i++) {
-      var x = i % Tank.gridCount;
-      var y = i ~/ Tank.gridCount;
+      var x = i % BaseTank.gridCount;
+      var y = i ~/ BaseTank.gridCount;
       var value = tank.currentTankCells[i];
       if (value != 0) {
         rectList.add(
           Rect.fromLTWH(
-            tank.position.x + x * Tank.gridSize,
-            tank.position.y + y * Tank.gridSize,
-            Tank.gridSize,
-            Tank.gridSize,
+            tank.position.x + x * BaseTank.gridSize,
+            tank.position.y + y * BaseTank.gridSize,
+            BaseTank.gridSize,
+            BaseTank.gridSize,
           ),
         );
       }
@@ -77,9 +82,9 @@ class Bullet extends PositionComponent with HasGameRef<Game> {
   @override
   void update(double dt) {
     super.update(dt);
-    if (position.x <= -Tank.gridSize ||
+    if (position.x <= -BaseTank.gridSize ||
         position.x > gameRef.size.x ||
-        position.y <= -Tank.gridSize ||
+        position.y <= -BaseTank.gridSize ||
         position.y > gameRef.size.y) {
       removeFromParent();
     } else {

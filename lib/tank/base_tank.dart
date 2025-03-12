@@ -7,10 +7,12 @@ import 'package:flutter/widgets.dart' show debugPrint;
 import 'package:flutter_tank_war/data/move_direction.dart';
 import 'package:flutter_tank_war/game.dart';
 import 'package:flutter_tank_war/tank/bullet.dart' show Bullet;
+import 'package:flutter_tank_war/tank/enemy_tank.dart';
+import 'package:flutter_tank_war/tank/hero_tank.dart';
 import 'package:flutter_tank_war/utils/canvas_utils.dart';
 
 /// 坦克基类
-abstract class Tank extends PositionComponent with HasGameRef<Game> {
+abstract class BaseTank extends PositionComponent with HasGameRef<Game> {
   /// 坦克的格子数
   static const int gridCount = 3;
 
@@ -18,25 +20,33 @@ abstract class Tank extends PositionComponent with HasGameRef<Game> {
   static double gridSize = 20;
 
   /// 构造函数
-  Tank({super.position, super.size, super.priority, super.anchor}) {
-    debugMode = true;
+  BaseTank({
+    this.life = 1,
+    super.position,
+    super.priority,
+    super.anchor,
+    this.moveDirection = MoveDirection.up,
+  }) {
     size = Vector2.all(gridSize * gridCount);
   }
 
-  /// 坦克的移动方向
-  MoveDirection moveDirection = MoveDirection.up;
+  /// 坦克的生命值
+  int life;
 
   /// 坦克的移动速度
   double moveSpeed = 100;
-
-  /// 坦克的核心颜色值
-  Color heartColor = Colors.transparent;
 
   /// 坦克绘制的表述数组
   abstract List<List<int>> tankCells;
 
   /// 当前的坦克对于的绘制表格数据
   List<int> currentTankCells = [];
+
+  /// 坦克的移动方向
+  MoveDirection moveDirection;
+
+  /// 坦克的核心颜色值
+  Color heartColor = Colors.transparent;
 
   /// 根据移动方向获取对应的绘制表格数据
   List<int> getTankCell(MoveDirection md) {
@@ -52,19 +62,30 @@ abstract class Tank extends PositionComponent with HasGameRef<Game> {
   }
 
   /// 判断是否与另一个坦克碰撞
-  bool isCollideWithTank(Tank tank) {
-    var otherRect = Rect.fromLTWH(
-      tank.position.x,
-      tank.position.y,
-      tank.size.x,
-      tank.size.y,
-    );
-    return Rect.fromLTWH(
-      position.x,
-      position.y,
-      size.x,
-      size.y,
-    ).overlaps(otherRect);
+  bool isCollideWithTank(BaseTank tank) {
+    Set<Rect> allOtherTankRects = {};
+    for (int i = 0; i < tank.currentTankCells.length; i++) {
+      int x = i % gridCount;
+      int y = i ~/ gridCount;
+      if (tank.currentTankCells[i] != 0) {
+        allOtherTankRects.add(
+          (tank.position + Vector2(x.toDouble(), y.toDouble()) * gridSize)
+              .toPositionedRect(Vector2.all(gridSize)),
+        );
+      }
+    }
+    for (int i = 0; i < currentTankCells.length; i++) {
+      int x = i % gridCount;
+      int y = i ~/ gridCount;
+      if (currentTankCells[i] != 0) {
+        var rect = (position + Vector2(x.toDouble(), y.toDouble()) * gridSize)
+            .toPositionedRect(Vector2.all(gridSize));
+        if (allOtherTankRects.contains(rect)) {
+          return true;
+        }
+      }
+    }
+    return false;
   }
 
   /// 开火、开炮
@@ -76,8 +97,8 @@ abstract class Tank extends PositionComponent with HasGameRef<Game> {
         ownerType: ownerType,
         speed: speed,
         moveDirection: moveDirection,
-        size: Vector2.all(Tank.gridSize),
-        position: position + Vector2(1, 1) * Tank.gridSize,
+        size: Vector2.all(BaseTank.gridSize),
+        position: position + Vector2(1, 1) * BaseTank.gridSize,
       ),
     );
   }
@@ -111,6 +132,15 @@ abstract class Tank extends PositionComponent with HasGameRef<Game> {
       position.x = gameRef.size.x - size.x;
     } else if (position.y > gameRef.size.y - size.y) {
       position.y = gameRef.size.y - size.y;
+    }
+    //判断是否为英雄坦克，与敌方碰撞时，英雄坦克不能再移动
+    if (this is HeroTank) {
+      var enemyTanks = gameRef.children.whereType<EnemyTank>();
+      for (var enemyTank in enemyTanks) {
+        if (enemyTank.isCollideWithTank(this)) {
+          position += moveDirection.vector * moveSpeed * dt;
+        }
+      }
     }
   }
 }
