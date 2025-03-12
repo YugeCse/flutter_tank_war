@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:math' show Random;
 
 import 'package:flame/components.dart' show TimerComponent;
+import 'package:flame/game.dart';
 import 'package:flutter_tank_war/data/move_direction.dart';
 import 'package:flutter_tank_war/tank/bullet.dart';
 import 'package:flutter_tank_war/tank/base_tank.dart';
@@ -37,28 +38,23 @@ class EnemyTank extends BaseTank {
   }
 
   /// 根据当前方向，返回下一个位置
-  MoveDirection generateRandomDirection() {
-    var heroTanks = gameRef.children.whereType<HeroTank>();
-    var moveDistance = moveDirection.vector * BaseTank.gridSize;
-    if (!heroTanks.any(
-      (el) => el.isCollideWithTank(this, intentOffset: moveDistance),
-    )) {
-      return MoveDirection.all[Random(
-        DateTime.now().millisecondsSinceEpoch,
-      ).nextInt(MoveDirection.all.length)];
-    }
-    return moveDirection; //如果发生了碰撞，它的移动方向不变
+  Vector2 generateRandomDirection() {
+    return MoveDirection.all[Random(
+      DateTime.now().millisecondsSinceEpoch,
+    ).nextInt(MoveDirection.all.length)]; //如果发生了碰撞，它的移动方向不变
   }
 
   /// 随机自动移动
   void randomAutoMove() {
-    moveDirection = generateRandomDirection(); // 随机方向
-    currentTankCells = getTankCell(moveDirection);
+    var nowDirection = generateRandomDirection(); // 随机方向
+    var currentTankCells = tankCells[nowDirection.toCellShapeIndex()];
     var heroTanks = gameRef.children.whereType<HeroTank>();
-    var moveDistance = moveDirection.vector * BaseTank.gridSize;
+    var moveDistance = nowDirection * BaseTank.gridSize;
     if (!heroTanks.any(
-      (el) => el.isCollideWithTank(this, intentOffset: moveDistance),
+      (el) => el.isCollideWithCells(position + moveDistance, currentTankCells),
     )) {
+      direction = nowDirection; // 如果没有发生碰撞，它的移动方向改变
+      this.currentTankCells = tankCells[direction.toCellShapeIndex()];
       position += moveDistance; // 移动坦克
     }
   }

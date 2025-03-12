@@ -22,7 +22,7 @@ class Bullet extends PositionComponent with HasGameRef<Game> {
     super.size,
     super.position,
     required this.ownerType,
-    required this.moveDirection,
+    required this.direction,
     this.speed = 100,
   });
 
@@ -33,7 +33,7 @@ class Bullet extends PositionComponent with HasGameRef<Game> {
   double speed;
 
   /// 子弹移动方向
-  final MoveDirection moveDirection;
+  final Vector2 direction;
 
   @override
   void render(Canvas canvas) {
@@ -106,7 +106,7 @@ class Bullet extends PositionComponent with HasGameRef<Game> {
           }
         }
       }
-      position += moveDirection.vector * dt * speed;
+      position += direction * dt * speed;
     }
   }
 }

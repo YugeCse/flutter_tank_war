@@ -1,9 +1,7 @@
-import 'dart:math';
 import 'dart:ui';
 
 import 'package:flame/components.dart';
 import 'package:flutter/material.dart' show Colors;
-import 'package:flutter/widgets.dart' show debugPrint;
 import 'package:flutter_tank_war/data/move_direction.dart';
 import 'package:flutter_tank_war/game.dart';
 import 'package:flutter_tank_war/tank/bullet.dart' show Bullet;
@@ -18,14 +16,8 @@ abstract class BaseTank extends PositionComponent with HasGameRef<Game> {
   static double gridSize = 20;
 
   /// 构造函数
-  BaseTank({
-    this.life = 1,
-    super.position,
-    super.priority,
-    super.anchor,
-    this.moveSpeed = 100,
-    this.moveDirection = MoveDirection.up,
-  }) {
+  BaseTank({this.life = 1, super.position, this.speed = 100})
+    : direction = MoveDirection.up {
     size = Vector2.all(gridSize * gridCount);
   }
 
@@ -33,7 +25,7 @@ abstract class BaseTank extends PositionComponent with HasGameRef<Game> {
   int life;
 
   /// 坦克的移动速度
-  double moveSpeed;
+  double speed;
 
   /// 坦克绘制的表述数组
   abstract List<List<int>> tankCells;
@@ -42,15 +34,36 @@ abstract class BaseTank extends PositionComponent with HasGameRef<Game> {
   List<int> currentTankCells = [];
 
   /// 坦克的移动方向
-  MoveDirection moveDirection;
+  Vector2 direction;
 
   /// 坦克的核心颜色值
   Color heartColor = Colors.transparent;
 
-  /// 根据移动方向获取对应的绘制表格数据
-  List<int> getTankCell(MoveDirection md) {
-    currentTankCells = tankCells[md.value];
-    return currentTankCells;
+  bool isCollideWithCells(Vector2 offset, List<int> cells) {
+    Set<Rect> allOtherTankRects = {};
+    for (int i = 0; i < cells.length; i++) {
+      int x = i % gridCount;
+      int y = i ~/ gridCount;
+      if (cells[i] != 0) {
+        allOtherTankRects.add(
+          (offset + Vector2(x * gridSize, y * gridSize)).toPositionedRect(
+            Vector2.all(gridSize),
+          ),
+        );
+      }
+    }
+    for (int i = 0; i < currentTankCells.length; i++) {
+      int x = i % gridCount;
+      int y = i ~/ gridCount;
+      if (currentTankCells[i] != 0) {
+        var rect = (position + Vector2(x * gridSize, y * gridSize))
+            .toPositionedRect(Vector2.all(gridSize));
+        if (allOtherTankRects.any((r) => r.intersect(rect).isEmpty == false)) {
+          return true;
+        }
+      }
+    }
+    return false;
   }
 
   /// 判断是否与另一个坦克碰撞
@@ -91,11 +104,11 @@ abstract class BaseTank extends PositionComponent with HasGameRef<Game> {
   void fire({required int ownerType, double speed = 100}) {
     gameRef.add(
       Bullet(
-        ownerType: ownerType,
         speed: speed,
-        moveDirection: moveDirection,
+        ownerType: ownerType,
+        direction: direction,
         size: Vector2.all(BaseTank.gridSize),
-        position: position + Vector2(1, 1) * BaseTank.gridSize,
+        position: position + Vector2.all(1.0) * BaseTank.gridSize,
       ),
     );
   }
@@ -124,7 +137,6 @@ abstract class BaseTank extends PositionComponent with HasGameRef<Game> {
       position.x = 0;
     } else if (position.y < 0) {
       position.y = 0;
-      debugPrint('y: $position.y');
     } else if (position.x > gameRef.size.x - size.x) {
       position.x = gameRef.size.x - size.x;
     } else if (position.y > gameRef.size.y - size.y) {

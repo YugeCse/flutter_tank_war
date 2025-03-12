@@ -1,29 +1,37 @@
 import 'package:flame/components.dart' show Vector2;
 
-enum MoveDirection {
-  up(0),
-  right(1),
-  down(2),
-  left(3);
+/// 移动方向类的声明
+class MoveDirection {
+  /// 私有化构造函数，防止外部创建对象
+  MoveDirection._();
 
-  final int value;
+  /// 向上
+  static final up = Vector2(0, -1);
 
-  const MoveDirection(this.value);
+  /// 向下
+  static final down = Vector2(0, 1);
 
-  static const List<MoveDirection> all = [up, down, left, right];
+  /// 向左
+  static final left = Vector2(-1, 0);
+
+  /// 向右
+  static final right = Vector2(1, 0);
+
+  static final all = [up, down, left, right];
 }
 
-extension MoveDirectionExtension on MoveDirection {
-  Vector2 get vector {
-    switch (this) {
-      case MoveDirection.up:
-        return Vector2(0, -1);
-      case MoveDirection.down:
-        return Vector2(0, 1);
-      case MoveDirection.left:
-        return Vector2(-1, 0);
-      case MoveDirection.right:
-        return Vector2(1, 0);
+extension MoveDirectionExtension on Vector2 {
+  /// 根据方向获取形状索引
+  int toCellShapeIndex() {
+    if (x == MoveDirection.up.x && y == MoveDirection.up.y) {
+      return 0;
+    } else if (x == MoveDirection.right.x && y == MoveDirection.right.y) {
+      return 1;
+    } else if (x == MoveDirection.down.x && y == MoveDirection.down.y) {
+      return 2;
+    } else if (x == MoveDirection.left.x && y == MoveDirection.left.y) {
+      return 3;
     }
+    return 0;
   }
 }

@@ -11,7 +11,7 @@ import 'package:flutter_tank_war/tank/enemy_tank.dart';
 /// 玩家坦克
 class HeroTank extends BaseTank {
   /// 构造方法
-  HeroTank({super.position, super.moveSpeed});
+  HeroTank({super.position, super.speed});
 
   @override
   List<List<int>> tankCells = [
@@ -30,7 +30,8 @@ class HeroTank extends BaseTank {
 
   @override
   FutureOr<void> onLoad() async {
-    currentTankCells = getTankCell(MoveDirection.up);
+    direction = MoveDirection.up;
+    currentTankCells = tankCells[direction.toCellShapeIndex()];
   }
 
   @override
@@ -39,53 +40,53 @@ class HeroTank extends BaseTank {
     var enemyTanks = gameRef.children.whereType<EnemyTank>();
     if (_isKeysPressed({LogicalKeyboardKey.keyW, LogicalKeyboardKey.arrowUp}) &&
         !enemyTanks.any(
-          (el) => el.isCollideWithTank(
-            this,
-            intentOffset: MoveDirection.up.vector * moveSpeed * dt,
+          (el) => el.isCollideWithCells(
+            position + MoveDirection.up * speed * dt,
+            tankCells[MoveDirection.up.toCellShapeIndex()],
           ),
         )) {
-      moveDirection = MoveDirection.up;
-      currentTankCells = getTankCell(moveDirection);
-      position += moveDirection.vector * moveSpeed * dt;
+      direction = MoveDirection.up;
+      currentTankCells = tankCells[direction.toCellShapeIndex()];
+      position += direction * speed * dt;
     } else if (_isKeysPressed({
           LogicalKeyboardKey.keyD,
           LogicalKeyboardKey.arrowRight,
         }) &&
         !enemyTanks.any(
-          (el) => el.isCollideWithTank(
-            this,
-            intentOffset: MoveDirection.right.vector * moveSpeed * dt,
+          (el) => el.isCollideWithCells(
+            position + MoveDirection.right * speed * dt,
+            tankCells[MoveDirection.right.toCellShapeIndex()],
           ),
         )) {
-      moveDirection = MoveDirection.right;
-      currentTankCells = getTankCell(moveDirection);
-      position += moveDirection.vector * moveSpeed * dt;
+      direction = MoveDirection.right;
+      currentTankCells = tankCells[direction.toCellShapeIndex()];
+      position += direction * speed * dt;
     } else if (_isKeysPressed({
           LogicalKeyboardKey.keyS,
           LogicalKeyboardKey.arrowDown,
         }) &&
         !enemyTanks.any(
-          (el) => el.isCollideWithTank(
-            this,
-            intentOffset: MoveDirection.down.vector * moveSpeed * dt,
+          (el) => el.isCollideWithCells(
+            position + MoveDirection.down * speed * dt,
+            tankCells[MoveDirection.down.toCellShapeIndex()],
           ),
         )) {
-      moveDirection = MoveDirection.down;
-      currentTankCells = getTankCell(moveDirection);
-      position += moveDirection.vector * moveSpeed * dt;
+      direction = MoveDirection.down;
+      currentTankCells = tankCells[direction.toCellShapeIndex()];
+      position += direction * speed * dt;
     } else if (_isKeysPressed({
           LogicalKeyboardKey.keyA,
           LogicalKeyboardKey.arrowLeft,
         }) &&
         !enemyTanks.any(
-          (el) => el.isCollideWithTank(
-            this,
-            intentOffset: MoveDirection.left.vector * moveSpeed * dt,
+          (el) => el.isCollideWithCells(
+            position + MoveDirection.left * speed * dt,
+            tankCells[MoveDirection.left.toCellShapeIndex()],
           ),
         )) {
-      moveDirection = MoveDirection.left;
-      currentTankCells = getTankCell(moveDirection);
-      position += moveDirection.vector * moveSpeed * dt;
+      direction = MoveDirection.left;
+      currentTankCells = tankCells[direction.toCellShapeIndex()];
+      position += direction * speed * dt;
     }
   }
 
