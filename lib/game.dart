@@ -13,11 +13,11 @@ class Game extends FlameGame with KeyboardEvents {
 
   @override
   void onLoad() async {
+    add(heroTank = HeroTank(position: Vector2(100, 400)));
     List.generate(
-      10,
+      1,
       (index) => add(EnemyTank()..position = Vector2.all(index * 100)),
     );
-    add(heroTank = HeroTank(position: Vector2(100, 400)));
   }
 
   @override

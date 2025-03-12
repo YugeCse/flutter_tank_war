@@ -23,6 +23,7 @@ abstract class BaseTank extends PositionComponent with HasGameRef<Game> {
     super.position,
     super.priority,
     super.anchor,
+    this.moveSpeed = 100,
     this.moveDirection = MoveDirection.up,
   }) {
     size = Vector2.all(gridSize * gridCount);
@@ -32,7 +33,7 @@ abstract class BaseTank extends PositionComponent with HasGameRef<Game> {
   int life;
 
   /// 坦克的移动速度
-  double moveSpeed = 100;
+  double moveSpeed;
 
   /// 坦克绘制的表述数组
   abstract List<List<int>> tankCells;
