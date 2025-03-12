@@ -41,7 +41,7 @@ class EnemyTank extends BaseTank {
     var heroTanks = gameRef.children.whereType<HeroTank>();
     var moveDistance = moveDirection.vector * BaseTank.gridSize;
     if (!heroTanks.any(
-      (el) => el.isCollideWithTank(this, moveOffset: moveDistance),
+      (el) => el.isCollideWithTank(this, intentOffset: moveDistance),
     )) {
       return MoveDirection.all[Random(
         DateTime.now().millisecondsSinceEpoch,
@@ -57,7 +57,7 @@ class EnemyTank extends BaseTank {
     var heroTanks = gameRef.children.whereType<HeroTank>();
     var moveDistance = moveDirection.vector * BaseTank.gridSize;
     if (!heroTanks.any(
-      (el) => el.isCollideWithTank(this, moveOffset: moveDistance),
+      (el) => el.isCollideWithTank(this, intentOffset: moveDistance),
     )) {
       position += moveDistance; // 移动坦克
     }

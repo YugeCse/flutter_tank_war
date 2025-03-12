@@ -37,51 +37,55 @@ class HeroTank extends BaseTank {
   void update(double dt) {
     super.update(dt);
     var enemyTanks = gameRef.children.whereType<EnemyTank>();
-    if (_isKeysPressed({LogicalKeyboardKey.keyW, LogicalKeyboardKey.arrowUp})) {
+    if (_isKeysPressed({LogicalKeyboardKey.keyW, LogicalKeyboardKey.arrowUp}) &&
+        !enemyTanks.any(
+          (el) => el.isCollideWithTank(
+            this,
+            intentOffset: MoveDirection.up.vector * moveSpeed * dt,
+          ),
+        )) {
       moveDirection = MoveDirection.up;
       currentTankCells = getTankCell(moveDirection);
-      var moveDistance = moveDirection.vector * moveSpeed * dt;
-      if (!enemyTanks.any(
-        (element) => element.isCollideWithTank(this, moveOffset: moveDistance),
-      )) {
-        position += moveDistance;
-      }
+      position += moveDirection.vector * moveSpeed * dt;
     } else if (_isKeysPressed({
-      LogicalKeyboardKey.keyD,
-      LogicalKeyboardKey.arrowRight,
-    })) {
+          LogicalKeyboardKey.keyD,
+          LogicalKeyboardKey.arrowRight,
+        }) &&
+        !enemyTanks.any(
+          (el) => el.isCollideWithTank(
+            this,
+            intentOffset: MoveDirection.right.vector * moveSpeed * dt,
+          ),
+        )) {
       moveDirection = MoveDirection.right;
       currentTankCells = getTankCell(moveDirection);
-      var moveDistance = moveDirection.vector * moveSpeed * dt;
-      if (!enemyTanks.any(
-        (element) => element.isCollideWithTank(this, moveOffset: moveDistance),
-      )) {
-        position += moveDistance;
-      }
+      position += moveDirection.vector * moveSpeed * dt;
     } else if (_isKeysPressed({
-      LogicalKeyboardKey.keyS,
-      LogicalKeyboardKey.arrowDown,
-    })) {
+          LogicalKeyboardKey.keyS,
+          LogicalKeyboardKey.arrowDown,
+        }) &&
+        !enemyTanks.any(
+          (el) => el.isCollideWithTank(
+            this,
+            intentOffset: MoveDirection.down.vector * moveSpeed * dt,
+          ),
+        )) {
       moveDirection = MoveDirection.down;
       currentTankCells = getTankCell(moveDirection);
-      var moveDistance = moveDirection.vector * moveSpeed * dt;
-      if (!enemyTanks.any(
-        (element) => element.isCollideWithTank(this, moveOffset: moveDistance),
-      )) {
-        position += moveDistance;
-      }
+      position += moveDirection.vector * moveSpeed * dt;
     } else if (_isKeysPressed({
-      LogicalKeyboardKey.keyA,
-      LogicalKeyboardKey.arrowLeft,
-    })) {
+          LogicalKeyboardKey.keyA,
+          LogicalKeyboardKey.arrowLeft,
+        }) &&
+        !enemyTanks.any(
+          (el) => el.isCollideWithTank(
+            this,
+            intentOffset: MoveDirection.left.vector * moveSpeed * dt,
+          ),
+        )) {
       moveDirection = MoveDirection.left;
       currentTankCells = getTankCell(moveDirection);
-      var moveDistance = moveDirection.vector * moveSpeed * dt;
-      if (!enemyTanks.any(
-        (element) => element.isCollideWithTank(this, moveOffset: moveDistance),
-      )) {
-        position += moveDistance;
-      }
+      position += moveDirection.vector * moveSpeed * dt;
     }
   }
 

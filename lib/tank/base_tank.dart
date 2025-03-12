@@ -54,9 +54,9 @@ abstract class BaseTank extends PositionComponent with HasGameRef<Game> {
 
   /// 判断是否与另一个坦克碰撞
   /// - [tank] 另一个坦克
-  /// - [moveOffset] 偏移量
-  bool isCollideWithTank(BaseTank tank, {Vector2? moveOffset}) {
-    Vector2 targetMoveOffset = moveOffset ?? Vector2.zero();
+  /// - [intentOffset] 意向偏移量
+  bool isCollideWithTank(BaseTank tank, {Vector2? intentOffset}) {
+    Vector2 targetMoveOffset = intentOffset ?? Vector2.zero();
     Set<Rect> allOtherTankRects = {};
     for (int i = 0; i < tank.currentTankCells.length; i++) {
       int x = i % gridCount;
