@@ -36,13 +36,30 @@ class EnemyTank extends BaseTank {
     );
   }
 
+  /// 根据当前方向，返回下一个位置
+  MoveDirection generateRandomDirection() {
+    var heroTanks = gameRef.children.whereType<HeroTank>();
+    var moveDistance = moveDirection.vector * BaseTank.gridSize;
+    if (!heroTanks.any(
+      (el) => el.isCollideWithTank(this, moveOffset: moveDistance),
+    )) {
+      return MoveDirection.all[Random(
+        DateTime.now().millisecondsSinceEpoch,
+      ).nextInt(MoveDirection.all.length)];
+    }
+    return moveDirection; //如果发生了碰撞，它的移动方向不变
+  }
+
   /// 随机自动移动
   void randomAutoMove() {
     moveDirection = generateRandomDirection(); // 随机方向
     currentTankCells = getTankCell(moveDirection);
     var heroTanks = gameRef.children.whereType<HeroTank>();
-    if (!heroTanks.any((el) => el.isCollideWithTank(this))) {
-      position += moveDirection.vector * BaseTank.gridSize; // 移动坦克
+    var moveDistance = moveDirection.vector * BaseTank.gridSize;
+    if (!heroTanks.any(
+      (el) => el.isCollideWithTank(this, moveOffset: moveDistance),
+    )) {
+      position += moveDistance; // 移动坦克
     }
   }
 

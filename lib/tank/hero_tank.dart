@@ -40,8 +40,11 @@ class HeroTank extends BaseTank {
     if (_isKeysPressed({LogicalKeyboardKey.keyW, LogicalKeyboardKey.arrowUp})) {
       moveDirection = MoveDirection.up;
       currentTankCells = getTankCell(moveDirection);
-      if (!enemyTanks.any((element) => element.isCollideWithTank(this))) {
-        position += moveDirection.vector * moveSpeed * dt;
+      var moveDistance = moveDirection.vector * moveSpeed * dt;
+      if (!enemyTanks.any(
+        (element) => element.isCollideWithTank(this, moveOffset: moveDistance),
+      )) {
+        position += moveDistance;
       }
     } else if (_isKeysPressed({
       LogicalKeyboardKey.keyD,
@@ -49,8 +52,11 @@ class HeroTank extends BaseTank {
     })) {
       moveDirection = MoveDirection.right;
       currentTankCells = getTankCell(moveDirection);
-      if (!enemyTanks.any((element) => element.isCollideWithTank(this))) {
-        position += moveDirection.vector * moveSpeed * dt;
+      var moveDistance = moveDirection.vector * moveSpeed * dt;
+      if (!enemyTanks.any(
+        (element) => element.isCollideWithTank(this, moveOffset: moveDistance),
+      )) {
+        position += moveDistance;
       }
     } else if (_isKeysPressed({
       LogicalKeyboardKey.keyS,
@@ -58,8 +64,11 @@ class HeroTank extends BaseTank {
     })) {
       moveDirection = MoveDirection.down;
       currentTankCells = getTankCell(moveDirection);
-      if (!enemyTanks.any((element) => element.isCollideWithTank(this))) {
-        position += moveDirection.vector * moveSpeed * dt;
+      var moveDistance = moveDirection.vector * moveSpeed * dt;
+      if (!enemyTanks.any(
+        (element) => element.isCollideWithTank(this, moveOffset: moveDistance),
+      )) {
+        position += moveDistance;
       }
     } else if (_isKeysPressed({
       LogicalKeyboardKey.keyA,
@@ -67,8 +76,11 @@ class HeroTank extends BaseTank {
     })) {
       moveDirection = MoveDirection.left;
       currentTankCells = getTankCell(moveDirection);
-      if (!enemyTanks.any((element) => element.isCollideWithTank(this))) {
-        position += moveDirection.vector * moveSpeed * dt;
+      var moveDistance = moveDirection.vector * moveSpeed * dt;
+      if (!enemyTanks.any(
+        (element) => element.isCollideWithTank(this, moveOffset: moveDistance),
+      )) {
+        position += moveDistance;
       }
     }
   }

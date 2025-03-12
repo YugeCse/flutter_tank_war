@@ -7,8 +7,6 @@ import 'package:flutter/widgets.dart' show debugPrint;
 import 'package:flutter_tank_war/data/move_direction.dart';
 import 'package:flutter_tank_war/game.dart';
 import 'package:flutter_tank_war/tank/bullet.dart' show Bullet;
-import 'package:flutter_tank_war/tank/enemy_tank.dart';
-import 'package:flutter_tank_war/tank/hero_tank.dart';
 import 'package:flutter_tank_war/utils/canvas_utils.dart';
 
 /// 坦克基类
@@ -54,15 +52,11 @@ abstract class BaseTank extends PositionComponent with HasGameRef<Game> {
     return currentTankCells;
   }
 
-  /// 根据当前方向，返回下一个位置
-  MoveDirection generateRandomDirection() {
-    return MoveDirection.all[Random(
-      DateTime.now().millisecondsSinceEpoch,
-    ).nextInt(MoveDirection.all.length)];
-  }
-
   /// 判断是否与另一个坦克碰撞
-  bool isCollideWithTank(BaseTank tank) {
+  /// - [tank] 另一个坦克
+  /// - [moveOffset] 偏移量
+  bool isCollideWithTank(BaseTank tank, {Vector2? moveOffset}) {
+    Vector2 targetMoveOffset = moveOffset ?? Vector2.zero();
     Set<Rect> allOtherTankRects = {};
     for (int i = 0; i < tank.currentTankCells.length; i++) {
       int x = i % gridCount;
@@ -78,7 +72,9 @@ abstract class BaseTank extends PositionComponent with HasGameRef<Game> {
       int x = i % gridCount;
       int y = i ~/ gridCount;
       if (currentTankCells[i] != 0) {
-        var rect = (position + Vector2(x * gridSize, y * gridSize))
+        var rect = (targetMoveOffset +
+                position +
+                Vector2(x * gridSize, y * gridSize))
             .toPositionedRect(Vector2.all(gridSize));
         if (allOtherTankRects.any((r) => r.intersect(rect).isEmpty == false)) {
           return true;
@@ -133,14 +129,5 @@ abstract class BaseTank extends PositionComponent with HasGameRef<Game> {
     } else if (position.y > gameRef.size.y - size.y) {
       position.y = gameRef.size.y - size.y;
     }
-    // //判断是否为英雄坦克，与敌方碰撞时，英雄坦克不能再移动
-    // if (this is HeroTank) {
-    //   for (var enemyTank in gameRef.children.whereType<EnemyTank>()) {
-    //     if (isCollideWithTank(enemyTank)) {
-    //       debugPrint('hero tank is collide');
-    //       position -= moveDirection.vector;
-    //     }
-    //   }
-    // }
   }
 }
