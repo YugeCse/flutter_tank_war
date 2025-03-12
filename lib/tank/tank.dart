@@ -3,6 +3,7 @@ import 'dart:ui';
 
 import 'package:flame/components.dart';
 import 'package:flutter/material.dart' show Colors;
+import 'package:flutter/widgets.dart' show debugPrint;
 import 'package:flutter_tank_war/data/move_direction.dart';
 import 'package:flutter_tank_war/game.dart';
 import 'package:flutter_tank_war/tank/bullet.dart' show Bullet;
@@ -15,6 +16,12 @@ abstract class Tank extends PositionComponent with HasGameRef<Game> {
 
   /// 坦克的格子大小
   static double gridSize = 20;
+
+  /// 构造函数
+  Tank({super.position, super.size, super.priority, super.anchor}) {
+    debugMode = true;
+    size = Vector2.all(gridSize * gridCount);
+  }
 
   /// 坦克的移动方向
   MoveDirection moveDirection = MoveDirection.up;
@@ -35,10 +42,6 @@ abstract class Tank extends PositionComponent with HasGameRef<Game> {
   List<int> getTankCell(MoveDirection md) {
     currentTankCells = tankCells[md.value];
     return currentTankCells;
-  }
-
-  Tank() {
-    size = Vector2.all(gridSize * gridCount);
   }
 
   /// 根据当前方向，返回下一个位置
@@ -68,15 +71,13 @@ abstract class Tank extends PositionComponent with HasGameRef<Game> {
   /// - [ownerType] 开火者类型, [Bullet.typeOfEnemyBullet], [Bullet.typeOfHeroBullet]
   /// - [speed] 子弹速度, 默认：100
   void fire({required int ownerType, double speed = 100}) {
-    Vector2 adjustVector =
-        moveDirection == MoveDirection.up ? Vector2(1, -1) : Vector2(1, 1);
     gameRef.add(
       Bullet(
         ownerType: ownerType,
         speed: speed,
         moveDirection: moveDirection,
         size: Vector2.all(Tank.gridSize),
-        position: position + adjustVector * Tank.gridSize,
+        position: position + Vector2(1, 1) * Tank.gridSize,
       ),
     );
   }
@@ -100,13 +101,15 @@ abstract class Tank extends PositionComponent with HasGameRef<Game> {
   @override
   void update(double dt) {
     super.update(dt);
-    if (position.x <= 0) {
+    // 防止越界的判断处理
+    if (position.x < 0) {
       position.x = 0;
-    } else if (position.x >= gameRef.size.x - size.x) {
-      position.x = gameRef.size.x - size.x;
-    } else if (position.y <= 0) {
+    } else if (position.y < 0) {
       position.y = 0;
-    } else if (position.y >= gameRef.size.y - size.y) {
+      debugPrint('y: $position.y');
+    } else if (position.x > gameRef.size.x - size.x) {
+      position.x = gameRef.size.x - size.x;
+    } else if (position.y > gameRef.size.y - size.y) {
       position.y = gameRef.size.y - size.y;
     }
   }

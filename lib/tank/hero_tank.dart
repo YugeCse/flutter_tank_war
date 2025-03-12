@@ -8,6 +8,8 @@ import 'package:flutter_tank_war/tank/bullet.dart';
 import 'package:flutter_tank_war/tank/tank.dart';
 
 class HeroTank extends Tank {
+  HeroTank({super.position, super.size});
+
   @override
   List<List<int>> tankCells = [
     [0, 1, 0, 1, 1, 1, 1, 2, 1], //上
