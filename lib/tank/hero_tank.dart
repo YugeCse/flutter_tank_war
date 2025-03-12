@@ -6,6 +6,7 @@ import 'package:flutter/services.dart'
 import 'package:flutter_tank_war/data/move_direction.dart';
 import 'package:flutter_tank_war/tank/bullet.dart';
 import 'package:flutter_tank_war/tank/base_tank.dart';
+import 'package:flutter_tank_war/tank/enemy_tank.dart';
 
 /// 玩家坦克
 class HeroTank extends BaseTank {
@@ -35,31 +36,40 @@ class HeroTank extends BaseTank {
   @override
   void update(double dt) {
     super.update(dt);
+    var enemyTanks = gameRef.children.whereType<EnemyTank>();
     if (_isKeysPressed({LogicalKeyboardKey.keyW, LogicalKeyboardKey.arrowUp})) {
       moveDirection = MoveDirection.up;
       currentTankCells = getTankCell(moveDirection);
-      position += moveDirection.vector * moveSpeed * dt;
+      if (!enemyTanks.any((element) => element.isCollideWithTank(this))) {
+        position += moveDirection.vector * moveSpeed * dt;
+      }
     } else if (_isKeysPressed({
       LogicalKeyboardKey.keyD,
       LogicalKeyboardKey.arrowRight,
     })) {
       moveDirection = MoveDirection.right;
       currentTankCells = getTankCell(moveDirection);
-      position += moveDirection.vector * moveSpeed * dt;
+      if (!enemyTanks.any((element) => element.isCollideWithTank(this))) {
+        position += moveDirection.vector * moveSpeed * dt;
+      }
     } else if (_isKeysPressed({
       LogicalKeyboardKey.keyS,
       LogicalKeyboardKey.arrowDown,
     })) {
       moveDirection = MoveDirection.down;
       currentTankCells = getTankCell(moveDirection);
-      position += moveDirection.vector * moveSpeed * dt;
+      if (!enemyTanks.any((element) => element.isCollideWithTank(this))) {
+        position += moveDirection.vector * moveSpeed * dt;
+      }
     } else if (_isKeysPressed({
       LogicalKeyboardKey.keyA,
       LogicalKeyboardKey.arrowLeft,
     })) {
       moveDirection = MoveDirection.left;
       currentTankCells = getTankCell(moveDirection);
-      position += moveDirection.vector * moveSpeed * dt;
+      if (!enemyTanks.any((element) => element.isCollideWithTank(this))) {
+        position += moveDirection.vector * moveSpeed * dt;
+      }
     }
   }
 

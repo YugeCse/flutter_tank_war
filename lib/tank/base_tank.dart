@@ -69,7 +69,7 @@ abstract class BaseTank extends PositionComponent with HasGameRef<Game> {
       int y = i ~/ gridCount;
       if (tank.currentTankCells[i] != 0) {
         allOtherTankRects.add(
-          (tank.position + Vector2(x.toDouble(), y.toDouble()) * gridSize)
+          (tank.position + Vector2(x * gridSize, y * gridSize))
               .toPositionedRect(Vector2.all(gridSize)),
         );
       }
@@ -78,9 +78,9 @@ abstract class BaseTank extends PositionComponent with HasGameRef<Game> {
       int x = i % gridCount;
       int y = i ~/ gridCount;
       if (currentTankCells[i] != 0) {
-        var rect = (position + Vector2(x.toDouble(), y.toDouble()) * gridSize)
+        var rect = (position + Vector2(x * gridSize, y * gridSize))
             .toPositionedRect(Vector2.all(gridSize));
-        if (allOtherTankRects.contains(rect)) {
+        if (allOtherTankRects.any((r) => r.intersect(rect).isEmpty == false)) {
           return true;
         }
       }
@@ -133,14 +133,14 @@ abstract class BaseTank extends PositionComponent with HasGameRef<Game> {
     } else if (position.y > gameRef.size.y - size.y) {
       position.y = gameRef.size.y - size.y;
     }
-    //判断是否为英雄坦克，与敌方碰撞时，英雄坦克不能再移动
-    if (this is HeroTank) {
-      var enemyTanks = gameRef.children.whereType<EnemyTank>();
-      for (var enemyTank in enemyTanks) {
-        if (enemyTank.isCollideWithTank(this)) {
-          position += moveDirection.vector * moveSpeed * dt;
-        }
-      }
-    }
+    // //判断是否为英雄坦克，与敌方碰撞时，英雄坦克不能再移动
+    // if (this is HeroTank) {
+    //   for (var enemyTank in gameRef.children.whereType<EnemyTank>()) {
+    //     if (isCollideWithTank(enemyTank)) {
+    //       debugPrint('hero tank is collide');
+    //       position -= moveDirection.vector;
+    //     }
+    //   }
+    // }
   }
 }

@@ -5,6 +5,7 @@ import 'package:flame/components.dart' show TimerComponent;
 import 'package:flutter_tank_war/data/move_direction.dart';
 import 'package:flutter_tank_war/tank/bullet.dart';
 import 'package:flutter_tank_war/tank/base_tank.dart';
+import 'package:flutter_tank_war/tank/hero_tank.dart';
 
 /// 敌方坦克
 class EnemyTank extends BaseTank {
@@ -39,7 +40,10 @@ class EnemyTank extends BaseTank {
   void randomAutoMove() {
     moveDirection = generateRandomDirection(); // 随机方向
     currentTankCells = getTankCell(moveDirection);
-    position += moveDirection.vector * BaseTank.gridSize; // 移动坦克
+    var heroTanks = gameRef.children.whereType<HeroTank>();
+    if (!heroTanks.any((el) => el.isCollideWithTank(this))) {
+      position += moveDirection.vector * BaseTank.gridSize; // 移动坦克
+    }
   }
 
   @override

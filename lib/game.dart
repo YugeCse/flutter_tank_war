@@ -2,7 +2,7 @@ import 'dart:ui';
 
 import 'package:flame/game.dart';
 import 'package:flame/input.dart';
-import 'package:flutter/material.dart' show Colors, KeyEventResult;
+import 'package:flutter/material.dart' show KeyEventResult;
 import 'package:flutter/services.dart' show LogicalKeyboardKey;
 import 'package:flutter/widgets.dart' show KeyEvent;
 import 'package:flutter_tank_war/tank/enemy_tank.dart';
@@ -17,7 +17,7 @@ class Game extends FlameGame with KeyboardEvents {
       10,
       (index) => add(EnemyTank()..position = Vector2.all(index * 100)),
     );
-    add(heroTank = HeroTank(position: Vector2.all(300)));
+    add(heroTank = HeroTank(position: Vector2(100, 400)));
   }
 
   @override
