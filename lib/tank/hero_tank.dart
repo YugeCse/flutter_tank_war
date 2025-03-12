@@ -15,7 +15,11 @@ class HeroTank extends Tank {
     [0, 1, 1, 1, 1, 2, 0, 1, 1], //左
   ];
 
-  bool _canMove = false;
+  final Set<LogicalKeyboardKey> _pressedKeys = {};
+
+  bool _isKeysPressed(Set<LogicalKeyboardKey> keys) {
+    return _pressedKeys.intersection(keys).length > 1;
+  }
 
   @override
   FutureOr<void> onLoad() async {
@@ -26,55 +30,58 @@ class HeroTank extends Tank {
   @override
   void update(double dt) {
     super.update(dt);
-    if (_canMove) {
-      position += moveDirection.vector * dt * 200;
+    if (_isKeysPressed({LogicalKeyboardKey.keyW, LogicalKeyboardKey.arrowUp})) {
+      moveDirection = MoveDirection.up;
+      currentTankCells = getTankCell(moveDirection);
+      position += moveDirection.vector * moveSpeed * dt;
+    } else if (_isKeysPressed({
+      LogicalKeyboardKey.keyD,
+      LogicalKeyboardKey.arrowRight,
+    })) {
+      moveDirection = MoveDirection.right;
+      currentTankCells = getTankCell(moveDirection);
+      position += moveDirection.vector * moveSpeed * dt;
+    } else if (_isKeysPressed({
+      LogicalKeyboardKey.keyS,
+      LogicalKeyboardKey.arrowDown,
+    })) {
+      moveDirection = MoveDirection.down;
+      currentTankCells = getTankCell(moveDirection);
+      position += moveDirection.vector * moveSpeed * dt;
+    } else if (_isKeysPressed({
+      LogicalKeyboardKey.keyA,
+      LogicalKeyboardKey.arrowLeft,
+    })) {
+      moveDirection = MoveDirection.left;
+      currentTankCells = getTankCell(moveDirection);
+      position += moveDirection.vector * moveSpeed * dt;
     }
   }
 
   /// 处理键盘事件
   bool handleKeyEvent(KeyEvent event, Set<LogicalKeyboardKey> keysPressed) {
-    if (event is KeyUpEvent) {
-      _canMove = false;
-      return true;
-    } else if (event is KeyDownEvent) {
+    if (event is KeyDownEvent) {
       if (event.logicalKey == LogicalKeyboardKey.keyJ ||
           event.logicalKey == LogicalKeyboardKey.keyK) {
         fire();
         return true;
       }
-      if ([
-        LogicalKeyboardKey.arrowUp,
-        LogicalKeyboardKey.keyW,
-      ].contains(event.logicalKey)) {
-        _canMove = true;
-        moveDirection = MoveDirection.up;
-        currentTankCells = getTankCell(moveDirection);
-        return true;
-      } else if ([
-        LogicalKeyboardKey.arrowRight,
-        LogicalKeyboardKey.keyD,
-      ].contains(event.logicalKey)) {
-        _canMove = true;
-        moveDirection = MoveDirection.right;
-        currentTankCells = getTankCell(moveDirection);
-        return true;
-      } else if ([
-        LogicalKeyboardKey.arrowDown,
-        LogicalKeyboardKey.keyS,
-      ].contains(event.logicalKey)) {
-        _canMove = true;
-        moveDirection = MoveDirection.down;
-        currentTankCells = getTankCell(moveDirection);
-        return true;
-      } else if ([
-        LogicalKeyboardKey.arrowLeft,
-        LogicalKeyboardKey.keyA,
-      ].contains(event.logicalKey)) {
-        _canMove = true;
-        moveDirection = MoveDirection.left;
-        currentTankCells = getTankCell(moveDirection);
+      if (keysPressed.intersection({
+            LogicalKeyboardKey.keyW,
+            LogicalKeyboardKey.keyA,
+            LogicalKeyboardKey.keyS,
+            LogicalKeyboardKey.keyD,
+            LogicalKeyboardKey.arrowUp,
+            LogicalKeyboardKey.arrowLeft,
+            LogicalKeyboardKey.arrowDown,
+            LogicalKeyboardKey.arrowRight,
+          }).length ==
+          1) {
+        _pressedKeys.addAll(keysPressed); // 添加按下的键
         return true;
       }
+    } else if (event is KeyUpEvent) {
+      _pressedKeys.remove(event.logicalKey); // 移除松开的键
     }
     return false;
   }

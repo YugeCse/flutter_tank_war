@@ -19,6 +19,9 @@ abstract class Tank extends PositionComponent with HasGameRef<Game> {
   /// 坦克的移动方向
   MoveDirection moveDirection = MoveDirection.up;
 
+  /// 坦克的移动速度
+  double moveSpeed = 100;
+
   /// 坦克的核心颜色值
   Color heartColor = Colors.transparent;
 
@@ -45,15 +48,19 @@ abstract class Tank extends PositionComponent with HasGameRef<Game> {
     ).nextInt(MoveDirection.all.length)];
   }
 
-  bool overlaps(Tank bullet) {
+  bool isCollideWithTank(Tank tank) {
     var otherRect = Rect.fromLTWH(
-      bullet.position.x,
-      bullet.position.y,
-      bullet.size.x,
-      bullet.size.y,
+      tank.position.x,
+      tank.position.y,
+      tank.size.x,
+      tank.size.y,
     );
-    var rect = Rect.fromLTWH(position.x, position.y, size.x, size.y);
-    return rect.overlaps(otherRect);
+    return Rect.fromLTWH(
+      position.x,
+      position.y,
+      size.x,
+      size.y,
+    ).overlaps(otherRect);
   }
 
   void fire() {
@@ -82,7 +89,7 @@ abstract class Tank extends PositionComponent with HasGameRef<Game> {
         col: x,
         row: y,
         cellSize: gridSize,
-        renderColor: value != 0 ? Colors.red : Colors.transparent,
+        renderColor: value != 0 ? Colors.black : Colors.transparent,
       );
     }
   }
