@@ -12,7 +12,7 @@ import 'package:flutter_tank_war/tank/enemy_tank.dart';
 /// 玩家坦克
 class HeroTank extends BaseTank {
   /// 构造方法
-  HeroTank({super.position, super.speed});
+  HeroTank({super.position, super.speed, super.life = 3});
 
   @override
   List<List<int>> tankCells = [

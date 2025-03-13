@@ -1,8 +1,10 @@
 import 'dart:async';
 import 'dart:math' show Random;
+import 'dart:ui';
 
 import 'package:flame/components.dart' show TimerComponent;
 import 'package:flame/game.dart';
+import 'package:flutter/material.dart' show Colors;
 import 'package:flutter_tank_war/data/move_direction.dart';
 import 'package:flutter_tank_war/tank/bullet.dart';
 import 'package:flutter_tank_war/tank/base_tank.dart';
@@ -26,25 +28,38 @@ class EnemyTank extends BaseTank {
 
   @override
   FutureOr<void> onLoad() async {
+    debugMode = true;
     add(
       _timerComponent = TimerComponent(
         repeat: true,
         onTick: randomAutoMoveAndFire,
         period: _random.nextDouble() + 0.8, // 随机生成一个0.8~1.8秒的定时器
       ),
-    ); // 每秒执行一次
+    ); // 不同的坦克有不同的定时器随机重复时间
   }
 
   /// 根据当前方向，返回下一个位置
   Vector2 generateRandomDirection() {
     var heroTank = gameRef.heroTank;
-    if (heroTank != null && heroTank.position.distanceTo(position) <= 2000) {
-      var dx = heroTank.position.x - position.x;
-      var dy = heroTank.position.y - position.y;
-      if (dx.abs() > dy.abs()) {
-        return dx > 0 ? MoveDirection.right : MoveDirection.left;
-      } else {
-        return dy > 0 ? MoveDirection.down : MoveDirection.up;
+    if (heroTank != null) {
+      var distance = heroTank.position.distanceTo(position);
+      var value =
+          distance > 800
+              ? 0.9
+              : (distance > 500
+                  ? 0.7
+                  : distance > 200
+                  ? 0.5
+                  : 0.3);
+      var canSmartMove = _random.nextDouble() <= value;
+      if (canSmartMove) {
+        var dx = heroTank.position.x - position.x;
+        var dy = heroTank.position.y - position.y;
+        if (dx.abs() > dy.abs()) {
+          return dx > 0 ? MoveDirection.right : MoveDirection.left;
+        } else {
+          return dy > 0 ? MoveDirection.down : MoveDirection.up;
+        }
       }
     }
     return MoveDirection.all[_random.nextInt(
@@ -71,6 +86,19 @@ class EnemyTank extends BaseTank {
     if ((_random.nextInt(1000) + 1) % (_random.nextInt(5) + 1) == 0) {
       fire(ownerType: Bullet.typeOfEnemyBullet); // 射击
     }
+  }
+
+  @override
+  void render(Canvas canvas) {
+    super.render(canvas);
+    canvas.drawCircle(
+      (size / 2).toOffset(),
+      200,
+      Paint()
+        ..color = Colors.blue
+        ..strokeWidth = 3.0
+        ..style = PaintingStyle.stroke,
+    );
   }
 
   @override

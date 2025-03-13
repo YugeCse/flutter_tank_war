@@ -100,6 +100,21 @@ class Bullet extends PositionComponent with HasGameRef<Game> {
             return;
           }
         }
+      } else if (ownerType == typeOfEnemyBullet) {
+        var heroTank = gameRef.heroTank;
+        if (heroTank != null && isCollideWithTank(heroTank)) {
+          if (heroTank.life > 1) {
+            removeFromParent(); //与Hero坦克碰撞，从父组件中移除
+            heroTank.life--; //与Hero坦克子弹碰撞，减少生命值
+            gameRef.heroLifeTextComponent?.text = "Life: ${heroTank.life}";
+            return;
+          }
+          heroTank.life--; //与Hero坦克子弹碰撞，减少生命值
+          removeFromParent(); //与Hero坦克碰撞，从父组件中移除
+          heroTank.removeFromParent(); //与Hero坦克碰撞，从父组件中移除
+          gameRef.gameOver(); //游戏结束
+          return;
+        }
       }
       position += direction * dt * speed;
     }
