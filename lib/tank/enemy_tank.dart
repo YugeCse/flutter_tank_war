@@ -5,6 +5,7 @@ import 'dart:ui';
 import 'package:flame/components.dart' show TimerComponent;
 import 'package:flame/game.dart';
 import 'package:flutter/material.dart' show Colors;
+import 'package:flutter_tank_war/data/enemy_state.dart';
 import 'package:flutter_tank_war/data/move_direction.dart';
 import 'package:flutter_tank_war/tank/bullet.dart';
 import 'package:flutter_tank_war/tank/base_tank.dart';
@@ -22,6 +23,9 @@ class EnemyTank extends BaseTank {
     [1, 0, 1, 1, 1, 1, 0, 1, 0], //下
     [0, 1, 1, 1, 1, 0, 0, 1, 1], //左
   ];
+
+  /// 敌方坦克的状态 - 默认巡逻状态
+  EnemyState state = EnemyState.patrol;
 
   /// 坦克的移动控制定时器
   TimerComponent? _timerComponent;
@@ -42,15 +46,10 @@ class EnemyTank extends BaseTank {
   Vector2 generateRandomDirection() {
     var heroTank = gameRef.heroTank;
     if (heroTank != null) {
-      var distance = heroTank.position.distanceTo(position);
       var value =
-          distance > 800
-              ? 0.9
-              : (distance > 500
-                  ? 0.7
-                  : distance > 200
-                  ? 0.5
-                  : 0.3);
+          state == EnemyState.patrol
+              ? 0.3
+              : (state == EnemyState.chase ? 0.9 : 0.5); // 根据不同的状态，设置不同的概率
       var canSmartMove = _random.nextDouble() <= value;
       if (canSmartMove) {
         var dx = heroTank.position.x - position.x;
@@ -83,7 +82,10 @@ class EnemyTank extends BaseTank {
       currentTankCells = tankCells[direction.toCellShapeIndex()];
       position += moveTargetDistance; // 移动坦克
     }
-    if ((_random.nextInt(1000) + 1) % (_random.nextInt(5) + 1) == 0) {
+    if (_random.nextDouble() <=
+        (state == EnemyState.attack
+            ? 0.5
+            : (state == EnemyState.chase ? 0.4 : 0.3))) {
       fire(ownerType: Bullet.typeOfEnemyBullet); // 射击
     }
   }
@@ -99,6 +101,27 @@ class EnemyTank extends BaseTank {
         ..strokeWidth = 3.0
         ..style = PaintingStyle.stroke,
     );
+  }
+
+  @override
+  void update(double dt) {
+    super.update(dt);
+    updateEnemyState(); // 更新敌人状态
+  }
+
+  /// 更新敌人状态
+  void updateEnemyState() {
+    var heroTank = gameRef.heroTank;
+    if (heroTank != null) {
+      double distance = heroTank.position.distanceTo(position);
+      if (distance > 500) {
+        state = EnemyState.patrol;
+      } else if (distance > 300) {
+        state = EnemyState.chase;
+      } else {
+        state = EnemyState.attack;
+      }
+    }
   }
 
   @override
