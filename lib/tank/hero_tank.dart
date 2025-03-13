@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:flame/game.dart' show Vector2;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart'
     show KeyDownEvent, KeyUpEvent, LogicalKeyboardKey;
@@ -28,6 +29,21 @@ class HeroTank extends BaseTank {
   bool _isKeysPressed(Set<LogicalKeyboardKey> keys) =>
       _playerPressedKeys.intersection(keys).isNotEmpty;
 
+  /// 判断新的移动方向是否会与其他敌人坦克碰撞
+  bool _isCollideWithEnemyTanks({
+    required double dt,
+    required Vector2 targetDirection,
+  }) {
+    var enemyTanks = gameRef.children.whereType<EnemyTank>();
+    var targetCells = tankCells[targetDirection.toCellShapeIndex()];
+    return !enemyTanks.any(
+      (el) => el.isCollideWithCells(
+        position + targetDirection * speed * dt,
+        targetCells,
+      ),
+    );
+  }
+
   @override
   FutureOr<void> onLoad() async {
     direction = MoveDirection.up;
@@ -39,12 +55,7 @@ class HeroTank extends BaseTank {
     super.update(dt);
     var enemyTanks = gameRef.children.whereType<EnemyTank>();
     if (_isKeysPressed({LogicalKeyboardKey.keyW, LogicalKeyboardKey.arrowUp}) &&
-        !enemyTanks.any(
-          (el) => el.isCollideWithCells(
-            position + MoveDirection.up * speed * dt,
-            tankCells[MoveDirection.up.toCellShapeIndex()],
-          ),
-        )) {
+        !_isCollideWithEnemyTanks(dt: dt, targetDirection: MoveDirection.up)) {
       direction = MoveDirection.up;
       currentTankCells = tankCells[direction.toCellShapeIndex()];
       position += direction * speed * dt;
@@ -52,11 +63,9 @@ class HeroTank extends BaseTank {
           LogicalKeyboardKey.keyD,
           LogicalKeyboardKey.arrowRight,
         }) &&
-        !enemyTanks.any(
-          (el) => el.isCollideWithCells(
-            position + MoveDirection.right * speed * dt,
-            tankCells[MoveDirection.right.toCellShapeIndex()],
-          ),
+        !_isCollideWithEnemyTanks(
+          dt: dt,
+          targetDirection: MoveDirection.right,
         )) {
       direction = MoveDirection.right;
       currentTankCells = tankCells[direction.toCellShapeIndex()];
@@ -65,11 +74,9 @@ class HeroTank extends BaseTank {
           LogicalKeyboardKey.keyS,
           LogicalKeyboardKey.arrowDown,
         }) &&
-        !enemyTanks.any(
-          (el) => el.isCollideWithCells(
-            position + MoveDirection.down * speed * dt,
-            tankCells[MoveDirection.down.toCellShapeIndex()],
-          ),
+        !_isCollideWithEnemyTanks(
+          dt: dt,
+          targetDirection: MoveDirection.down,
         )) {
       direction = MoveDirection.down;
       currentTankCells = tankCells[direction.toCellShapeIndex()];
@@ -78,11 +85,9 @@ class HeroTank extends BaseTank {
           LogicalKeyboardKey.keyA,
           LogicalKeyboardKey.arrowLeft,
         }) &&
-        !enemyTanks.any(
-          (el) => el.isCollideWithCells(
-            position + MoveDirection.left * speed * dt,
-            tankCells[MoveDirection.left.toCellShapeIndex()],
-          ),
+        !_isCollideWithEnemyTanks(
+          dt: dt,
+          targetDirection: MoveDirection.left,
         )) {
       direction = MoveDirection.left;
       currentTankCells = tankCells[direction.toCellShapeIndex()];
@@ -91,12 +96,15 @@ class HeroTank extends BaseTank {
   }
 
   /// 处理键盘事件
-  bool handleKeyEvent(KeyEvent event, Set<LogicalKeyboardKey> keysPressed) {
+  KeyEventResult handleKeyEvent(
+    KeyEvent event,
+    Set<LogicalKeyboardKey> keysPressed,
+  ) {
     if (event is KeyDownEvent) {
       if (event.logicalKey == LogicalKeyboardKey.keyJ ||
           event.logicalKey == LogicalKeyboardKey.keyK) {
         fire(ownerType: Bullet.typeOfHeroBullet);
-        return true;
+        return KeyEventResult.handled;
       }
       if (keysPressed.intersection({
         LogicalKeyboardKey.keyW,
@@ -109,11 +117,11 @@ class HeroTank extends BaseTank {
         LogicalKeyboardKey.arrowRight,
       }).isNotEmpty) {
         _playerPressedKeys.addAll(keysPressed); // 添加按下的键
-        return true;
+        return KeyEventResult.handled;
       }
     } else if (event is KeyUpEvent) {
       _playerPressedKeys.remove(event.logicalKey); // 移除松开的键
     }
-    return false;
+    return KeyEventResult.ignored;
   }
 }

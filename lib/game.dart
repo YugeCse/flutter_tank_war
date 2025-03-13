@@ -34,7 +34,8 @@ class Game extends FlameGame with KeyboardEvents {
     KeyEvent event,
     Set<LogicalKeyboardKey> keysPressed,
   ) {
-    if (heroTank?.handleKeyEvent(event, keysPressed) == true) {
+    if (heroTank?.handleKeyEvent(event, keysPressed) ==
+        KeyEventResult.handled) {
       return KeyEventResult.handled;
     }
     return super.onKeyEvent(event, keysPressed);

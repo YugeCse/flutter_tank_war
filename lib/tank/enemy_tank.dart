@@ -46,16 +46,17 @@ class EnemyTank extends BaseTank {
 
   /// 随机自动移动
   void randomAutoMove() {
-    var nowDirection = generateRandomDirection(); // 随机方向
-    var currentTankCells = tankCells[nowDirection.toCellShapeIndex()];
+    var targetDirection = generateRandomDirection(); // 随机方向
+    var targetTankCells = tankCells[targetDirection.toCellShapeIndex()];
     var heroTanks = gameRef.children.whereType<HeroTank>();
-    var moveDistance = nowDirection * BaseTank.gridSize;
+    var moveTargetDistance = targetDirection * BaseTank.gridSize;
     if (!heroTanks.any(
-      (el) => el.isCollideWithCells(position + moveDistance, currentTankCells),
+      (el) =>
+          el.isCollideWithCells(position + moveTargetDistance, targetTankCells),
     )) {
-      direction = nowDirection; // 如果没有发生碰撞，它的移动方向改变
-      this.currentTankCells = tankCells[direction.toCellShapeIndex()];
-      position += moveDistance; // 移动坦克
+      direction = targetDirection; // 如果没有发生碰撞，它的移动方向改变
+      currentTankCells = tankCells[direction.toCellShapeIndex()];
+      position += moveTargetDistance; // 移动坦克
     }
   }
 
