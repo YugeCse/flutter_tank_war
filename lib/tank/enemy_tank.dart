@@ -10,6 +10,7 @@ import 'package:flutter_tank_war/tank/hero_tank.dart';
 
 /// 敌方坦克
 class EnemyTank extends BaseTank {
+  /// 随机事件的随机数生成对象
   final Random _random = Random();
 
   @override
