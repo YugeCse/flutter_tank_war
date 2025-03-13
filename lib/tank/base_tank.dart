@@ -39,7 +39,10 @@ abstract class BaseTank extends PositionComponent with HasGameRef<Game> {
   /// 坦克的核心颜色值
   Color heartColor = Colors.transparent;
 
-  bool isCollideWithCells(Vector2 offset, List<int> cells) {
+  /// 是否会与其他坦克的格子发生碰撞
+  /// - [offset] 偏移量，被碰撞坦克的偏移位置
+  /// - [cells] 被碰撞坦克的格子数据, 用来计算碰撞矩形
+  bool isCollideWithCells({required Vector2 offset, required List<int> cells}) {
     Set<Rect> allOtherTankRects = {};
     for (int i = 0; i < cells.length; i++) {
       int x = i % gridCount;

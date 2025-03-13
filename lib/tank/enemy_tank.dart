@@ -28,8 +28,9 @@ class EnemyTank extends BaseTank {
         period: 1.0,
         repeat: true,
         onTick: () {
+          var random = Random(DateTime.now().millisecondsSinceEpoch);
           randomAutoMove(); // 随机移动
-          if ((Random().nextInt(1000) + 1) % 5 == 0) {
+          if ((random.nextInt(1000) + 1) % (random.nextInt(5) + 1) == 0) {
             fire(ownerType: Bullet.typeOfEnemyBullet); // 射击
           }
         },
@@ -51,8 +52,10 @@ class EnemyTank extends BaseTank {
     var heroTanks = gameRef.children.whereType<HeroTank>();
     var moveTargetDistance = targetDirection * BaseTank.gridSize;
     if (!heroTanks.any(
-      (el) =>
-          el.isCollideWithCells(position + moveTargetDistance, targetTankCells),
+      (el) => el.isCollideWithCells(
+        cells: targetTankCells,
+        offset: position + moveTargetDistance,
+      ),
     )) {
       direction = targetDirection; // 如果没有发生碰撞，它的移动方向改变
       currentTankCells = tankCells[direction.toCellShapeIndex()];

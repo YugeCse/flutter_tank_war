@@ -57,25 +57,20 @@ class Bullet extends PositionComponent with HasGameRef<Game> {
 
   /// 与坦克发生碰撞
   bool isCollideWithTank(BaseTank tank) {
-    List<Rect> rectList = [];
     for (var i = 0; i < tank.currentTankCells.length; i++) {
       var x = i % BaseTank.gridCount;
       var y = i ~/ BaseTank.gridCount;
       var value = tank.currentTankCells[i];
       if (value != 0) {
-        rectList.add(
-          Rect.fromLTWH(
-            tank.position.x + x * BaseTank.gridSize,
-            tank.position.y + y * BaseTank.gridSize,
-            BaseTank.gridSize,
-            BaseTank.gridSize,
-          ),
-        );
+        var tankCellRect = (tank.position +
+                Vector2(x * BaseTank.gridSize, y * BaseTank.gridSize))
+            .toPositionedRect(Vector2.all(BaseTank.gridSize));
+        if (tankCellRect.overlaps(position.toPositionedRect(size))) {
+          return true;
+        }
       }
     }
-    var rect = Rect.fromLTWH(position.x, position.y, size.x, size.y);
-    debugPrint('rect = ${rect.size}');
-    return rectList.any((element) => element.overlaps(rect));
+    return false;
   }
 
   @override
@@ -85,23 +80,25 @@ class Bullet extends PositionComponent with HasGameRef<Game> {
         position.x > gameRef.size.x ||
         position.y <= -BaseTank.gridSize ||
         position.y > gameRef.size.y) {
-      removeFromParent();
+      removeFromParent(); //超出屏幕边界，从父组件中移除
     } else {
-      var allBullet = gameRef.children.whereType<Bullet>();
-      for (var bullet in allBullet) {
+      var allBullets = gameRef.children.whereType<Bullet>();
+      for (var bullet in allBullets) {
         if (bullet != this &&
             bullet.ownerType != ownerType &&
             bullet.isCollideWith(this)) {
-          removeFromParent();
-          bullet.removeFromParent();
+          removeFromParent(); //与子弹碰撞，从父组件中移除
+          bullet.removeFromParent(); //与子弹碰撞，从父组件中移除
+          return;
         }
       }
       if (ownerType == typeOfHeroBullet) {
         var allEnemyTanks = gameRef.children.whereType<EnemyTank>();
         for (var enemyTank in allEnemyTanks) {
           if (isCollideWithTank(enemyTank)) {
-            removeFromParent();
-            enemyTank.removeFromParent();
+            removeFromParent(); //与敌人坦克碰撞，从父组件中移除
+            enemyTank.removeFromParent(); //与Hero子弹碰撞，从父组件中移除
+            return;
           }
         }
       }

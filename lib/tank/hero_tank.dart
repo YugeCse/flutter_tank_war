@@ -30,16 +30,18 @@ class HeroTank extends BaseTank {
       _playerPressedKeys.intersection(keys).isNotEmpty;
 
   /// 判断新的移动方向是否会与其他敌人坦克碰撞
+  /// - [dt] 时间间隔, 用于计算这个时间间隔移动的距离
+  /// - [targetDirection] 目标方向，用于判断新的移动方向是否会与其他敌人坦克碰撞
   bool _isCollideWithEnemyTanks({
     required double dt,
     required Vector2 targetDirection,
   }) {
     var enemyTanks = gameRef.children.whereType<EnemyTank>();
     var targetCells = tankCells[targetDirection.toCellShapeIndex()];
-    return !enemyTanks.any(
+    return enemyTanks.any(
       (el) => el.isCollideWithCells(
-        position + targetDirection * speed * dt,
-        targetCells,
+        cells: targetCells,
+        offset: position + targetDirection * speed * dt,
       ),
     );
   }
