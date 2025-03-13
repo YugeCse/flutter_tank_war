@@ -2,9 +2,9 @@ import 'dart:async';
 import 'dart:math' show Random;
 import 'dart:ui';
 
-import 'package:flame/components.dart' show TimerComponent;
+import 'package:flame/components.dart' show TextComponent, TimerComponent;
 import 'package:flame/game.dart';
-import 'package:flutter/material.dart' show Colors;
+import 'package:flutter/material.dart' show Colors, TextStyle;
 import 'package:flutter_tank_war/data/enemy_state.dart';
 import 'package:flutter_tank_war/data/move_direction.dart';
 import 'package:flutter_tank_war/tank/bullet.dart';
@@ -30,6 +30,8 @@ class EnemyTank extends BaseTank {
   /// 坦克的移动控制定时器
   TimerComponent? _timerComponent;
 
+  TextComponent? _tvStateComponent;
+
   @override
   FutureOr<void> onLoad() async {
     debugMode = true;
@@ -40,6 +42,13 @@ class EnemyTank extends BaseTank {
         period: _random.nextDouble() + 0.8, // 随机生成一个0.8~1.8秒的定时器
       ),
     ); // 不同的坦克有不同的定时器随机重复时间
+    add(
+      _tvStateComponent = TextComponent(
+        text: state.toString(),
+        position: position + Vector2(size.x, -12),
+        textRenderer: TextPaint(style: TextStyle(fontSize: 12)),
+      ),
+    );
   }
 
   /// 根据当前方向，返回下一个位置
@@ -107,6 +116,7 @@ class EnemyTank extends BaseTank {
   void update(double dt) {
     super.update(dt);
     updateEnemyState(); // 更新敌人状态
+    _tvStateComponent?.text = state.toString();
   }
 
   /// 更新敌人状态

@@ -7,5 +7,8 @@ enum EnemyState {
   chase,
 
   /// 攻击
-  attack,
+  attack;
+
+  @override
+  String toString() => super.toString().replaceFirst("(E|e)nemy[S|s]tate.", "");
 }

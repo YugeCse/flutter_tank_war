@@ -7,6 +7,7 @@ import 'package:flutter/material.dart'
     show Colors, TextStyle, KeyEventResult, debugPrint;
 import 'package:flutter/services.dart' show LogicalKeyboardKey;
 import 'package:flutter/widgets.dart' show KeyEvent;
+import 'package:flutter_tank_war/board.dart';
 import 'package:flutter_tank_war/tank/base_tank.dart';
 import 'package:flutter_tank_war/tank/enemy_tank.dart';
 import 'package:flutter_tank_war/tank/hero_tank.dart';
@@ -20,6 +21,7 @@ class Game extends FlameGame with KeyboardEvents {
 
   @override
   void onLoad() async {
+    add(Board(size: size));
     List.generate(
       4,
       (index) => add(
