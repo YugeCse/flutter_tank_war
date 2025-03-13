@@ -39,8 +39,8 @@ class HeroTank extends BaseTank {
     var enemyTanks = gameRef.children.whereType<EnemyTank>();
     var targetCells = tankCells[targetDirection.toCellShapeIndex()];
     return enemyTanks.any(
-      (el) => el.isCollideWithCells(
-        cells: targetCells,
+      (el) => el.isCollideWithTankCells(
+        tankCells: targetCells,
         offset: position + targetDirection * speed * dt,
       ),
     );

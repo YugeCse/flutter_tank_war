@@ -39,36 +39,6 @@ abstract class BaseTank extends PositionComponent with HasGameRef<Game> {
   /// 坦克的核心颜色值
   Color heartColor = Colors.transparent;
 
-  /// 是否会与其他坦克的格子发生碰撞
-  /// - [offset] 偏移量，被碰撞坦克的偏移位置
-  /// - [cells] 被碰撞坦克的格子数据, 用来计算碰撞矩形
-  bool isCollideWithCells({required Vector2 offset, required List<int> cells}) {
-    Set<Rect> allOtherTankRects = {};
-    for (int i = 0; i < cells.length; i++) {
-      int x = i % gridCount;
-      int y = i ~/ gridCount;
-      if (cells[i] != 0) {
-        allOtherTankRects.add(
-          (offset + Vector2(x * gridSize, y * gridSize)).toPositionedRect(
-            Vector2.all(gridSize),
-          ),
-        );
-      }
-    }
-    for (int i = 0; i < currentTankCells.length; i++) {
-      int x = i % gridCount;
-      int y = i ~/ gridCount;
-      if (currentTankCells[i] != 0) {
-        var rect = (position + Vector2(x * gridSize, y * gridSize))
-            .toPositionedRect(Vector2.all(gridSize));
-        if (allOtherTankRects.any((r) => r.intersect(rect).isEmpty == false)) {
-          return true;
-        }
-      }
-    }
-    return false;
-  }
-
   /// 判断是否与另一个坦克碰撞
   /// - [tank] 另一个坦克
   /// - [intentOffset] 意向偏移量
@@ -92,6 +62,39 @@ abstract class BaseTank extends PositionComponent with HasGameRef<Game> {
         var rect = (targetMoveOffset +
                 position +
                 Vector2(x * gridSize, y * gridSize))
+            .toPositionedRect(Vector2.all(gridSize));
+        if (allOtherTankRects.any((r) => r.intersect(rect).isEmpty == false)) {
+          return true;
+        }
+      }
+    }
+    return false;
+  }
+
+  /// 是否会与其他坦克的格子发生碰撞
+  /// - [offset] 偏移量，被碰撞坦克的偏移位置
+  /// - [tankCells] 被碰撞坦克的格子数据, 用来计算碰撞矩形
+  bool isCollideWithTankCells({
+    required Vector2 offset,
+    required List<int> tankCells,
+  }) {
+    Set<Rect> allOtherTankRects = {};
+    for (int i = 0; i < tankCells.length; i++) {
+      int x = i % gridCount;
+      int y = i ~/ gridCount;
+      if (tankCells[i] != 0) {
+        allOtherTankRects.add(
+          (offset + Vector2(x * gridSize, y * gridSize)).toPositionedRect(
+            Vector2.all(gridSize),
+          ),
+        );
+      }
+    }
+    for (int i = 0; i < currentTankCells.length; i++) {
+      int x = i % gridCount;
+      int y = i ~/ gridCount;
+      if (currentTankCells[i] != 0) {
+        var rect = (position + Vector2(x * gridSize, y * gridSize))
             .toPositionedRect(Vector2.all(gridSize));
         if (allOtherTankRects.any((r) => r.intersect(rect).isEmpty == false)) {
           return true;

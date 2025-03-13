@@ -73,8 +73,8 @@ class EnemyTank extends BaseTank {
     var heroTanks = gameRef.children.whereType<HeroTank>();
     var moveTargetDistance = targetDirection * BaseTank.gridSize;
     if (!heroTanks.any(
-      (el) => el.isCollideWithCells(
-        cells: targetTankCells,
+      (el) => el.isCollideWithTankCells(
+        tankCells: targetTankCells,
         offset: position + moveTargetDistance,
       ),
     )) {
