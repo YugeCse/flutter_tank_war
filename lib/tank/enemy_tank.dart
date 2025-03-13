@@ -37,6 +37,16 @@ class EnemyTank extends BaseTank {
 
   /// 根据当前方向，返回下一个位置
   Vector2 generateRandomDirection() {
+    var heroTank = gameRef.heroTank;
+    if (heroTank != null && heroTank.position.distanceTo(position) <= 2000) {
+      var dx = heroTank.position.x - position.x;
+      var dy = heroTank.position.y - position.y;
+      if (dx.abs() > dy.abs()) {
+        return dx > 0 ? MoveDirection.right : MoveDirection.left;
+      } else {
+        return dy > 0 ? MoveDirection.down : MoveDirection.up;
+      }
+    }
     return MoveDirection.all[_random.nextInt(
       MoveDirection.all.length,
     )]; //如果发生了碰撞，它的移动方向不变

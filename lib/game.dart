@@ -17,7 +17,7 @@ class Game extends FlameGame with KeyboardEvents {
   @override
   void onLoad() async {
     List.generate(
-      10,
+      4,
       (index) => add(
         EnemyTank()
           ..position = index % 2 == 0 ? Vector2.all(0) : Vector2(size.x, 0),
