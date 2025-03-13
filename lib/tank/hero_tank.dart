@@ -53,7 +53,6 @@ class HeroTank extends BaseTank {
   @override
   void update(double dt) {
     super.update(dt);
-    var enemyTanks = gameRef.children.whereType<EnemyTank>();
     if (_isKeysPressed({LogicalKeyboardKey.keyW, LogicalKeyboardKey.arrowUp}) &&
         !_isCollideWithEnemyTanks(dt: dt, targetDirection: MoveDirection.up)) {
       direction = MoveDirection.up;
