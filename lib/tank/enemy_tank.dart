@@ -1,15 +1,13 @@
 import 'dart:async';
 import 'dart:math' show Random;
-import 'dart:ui';
 
 import 'package:flame/components.dart' show TextComponent, TimerComponent;
 import 'package:flame/game.dart';
-import 'package:flutter/material.dart' show Colors, TextStyle;
+import 'package:flutter/material.dart' show TextStyle;
 import 'package:flutter_tank_war/data/enemy_state.dart';
 import 'package:flutter_tank_war/data/move_direction.dart';
 import 'package:flutter_tank_war/tank/bullet.dart';
 import 'package:flutter_tank_war/tank/base_tank.dart';
-import 'package:flutter_tank_war/tank/hero_tank.dart';
 
 /// 敌方坦克
 class EnemyTank extends BaseTank {
@@ -34,7 +32,6 @@ class EnemyTank extends BaseTank {
 
   @override
   FutureOr<void> onLoad() async {
-    debugMode = true;
     add(
       _timerComponent = TimerComponent(
         repeat: true,
@@ -53,7 +50,7 @@ class EnemyTank extends BaseTank {
 
   /// 根据当前方向，返回下一个位置
   Vector2 generateRandomDirection() {
-    var heroTank = gameRef.heroTank;
+    var heroTank = gameRef.board?.heroTank;
     if (heroTank != null) {
       var value =
           state == EnemyState.patrol
@@ -79,17 +76,17 @@ class EnemyTank extends BaseTank {
   void randomAutoMoveAndFire() {
     var targetDirection = generateRandomDirection(); // 随机方向
     var targetTankCells = tankCells[targetDirection.toCellShapeIndex()];
-    var heroTanks = gameRef.children.whereType<HeroTank>();
+    var heroTank = gameRef.board?.heroTank;
     var moveTargetDistance = targetDirection * BaseTank.gridSize;
-    if (!heroTanks.any(
-      (el) => el.isCollideWithTankCells(
-        tankCells: targetTankCells,
-        offset: position + moveTargetDistance,
-      ),
-    )) {
+    if (heroTank?.isCollideWithTankCells(
+          tankCells: targetTankCells,
+          offset: position + moveTargetDistance,
+        ) !=
+        true) {
       direction = targetDirection; // 如果没有发生碰撞，它的移动方向改变
       currentTankCells = tankCells[direction.toCellShapeIndex()];
       position += moveTargetDistance; // 移动坦克
+      adjustTankPosition(); // 调整坦克位置
     }
     if (_random.nextDouble() <=
         (state == EnemyState.attack
@@ -97,19 +94,6 @@ class EnemyTank extends BaseTank {
             : (state == EnemyState.chase ? 0.4 : 0.3))) {
       fire(ownerType: Bullet.typeOfEnemyBullet); // 射击
     }
-  }
-
-  @override
-  void render(Canvas canvas) {
-    super.render(canvas);
-    canvas.drawCircle(
-      (size / 2).toOffset(),
-      200,
-      Paint()
-        ..color = Colors.blue
-        ..strokeWidth = 3.0
-        ..style = PaintingStyle.stroke,
-    );
   }
 
   @override
@@ -121,7 +105,7 @@ class EnemyTank extends BaseTank {
 
   /// 更新敌人状态
   void updateEnemyState() {
-    var heroTank = gameRef.heroTank;
+    var heroTank = gameRef.board?.heroTank;
     if (heroTank != null) {
       double distance = heroTank.position.distanceTo(position);
       if (distance > 500) {

@@ -81,7 +81,7 @@ class Bullet extends PositionComponent with HasGameRef<Game> {
         position.y > gameRef.size.y) {
       removeFromParent(); //超出屏幕边界，从父组件中移除
     } else {
-      var allBullets = gameRef.children.whereType<Bullet>();
+      var allBullets = gameRef.board?.children.whereType<Bullet>() ?? [];
       for (var bullet in allBullets) {
         if (bullet != this &&
             bullet.ownerType != ownerType &&
@@ -92,7 +92,8 @@ class Bullet extends PositionComponent with HasGameRef<Game> {
         }
       }
       if (ownerType == typeOfHeroBullet) {
-        var allEnemyTanks = gameRef.children.whereType<EnemyTank>();
+        var allEnemyTanks =
+            gameRef.board?.children.whereType<EnemyTank>() ?? [];
         for (var enemyTank in allEnemyTanks) {
           if (isCollideWithTank(enemyTank)) {
             removeFromParent(); //与敌人坦克碰撞，从父组件中移除
@@ -101,7 +102,7 @@ class Bullet extends PositionComponent with HasGameRef<Game> {
           }
         }
       } else if (ownerType == typeOfEnemyBullet) {
-        var heroTank = gameRef.heroTank;
+        var heroTank = gameRef.board?.heroTank;
         if (heroTank != null && isCollideWithTank(heroTank)) {
           if (heroTank.life > 1) {
             removeFromParent(); //与Hero坦克碰撞，从父组件中移除
@@ -116,7 +117,7 @@ class Bullet extends PositionComponent with HasGameRef<Game> {
           return;
         }
       }
-      position += direction * dt * speed;
+      position += direction * dt * speed; //更新子弹位置
     }
   }
 }

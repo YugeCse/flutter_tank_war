@@ -108,7 +108,7 @@ abstract class BaseTank extends PositionComponent with HasGameRef<Game> {
   /// - [ownerType] 开火者类型, [Bullet.typeOfEnemyBullet], [Bullet.typeOfHeroBullet]
   /// - [speed] 子弹速度, 默认：100
   void fire({required int ownerType, double speed = 100}) {
-    gameRef.add(
+    gameRef.board?.add(
       Bullet(
         speed: speed,
         ownerType: ownerType,
@@ -117,6 +117,20 @@ abstract class BaseTank extends PositionComponent with HasGameRef<Game> {
         position: position + Vector2.all(1.0) * BaseTank.gridSize,
       ),
     );
+  }
+
+  void adjustTankPosition() {
+    if (gameRef.board != null) {
+      if (position.x <= 0) {
+        position.x = 0;
+      } else if (position.y <= 0) {
+        position.y = 0;
+      } else if (position.x >= gameRef.board!.size.x - size.x) {
+        position.x = gameRef.board!.size.x - size.x;
+      } else if (position.y >= gameRef.board!.size.y - size.y) {
+        position.y = gameRef.board!.size.y - size.y;
+      }
+    }
   }
 
   @override
@@ -138,19 +152,6 @@ abstract class BaseTank extends PositionComponent with HasGameRef<Game> {
   @override
   void update(double dt) {
     super.update(dt);
-    // 防止越界的判断处理
-    if (gameRef.board != null) {
-      if (position.x <= gameRef.mapOffset.dx) {
-        position.x = gameRef.mapOffset.dx;
-      } else if (position.y <= gameRef.mapOffset.dy) {
-        position.y = game.mapOffset.dy;
-      } else if (position.x >=
-          gameRef.mapOffset.dx + gameRef.board!.size.x - size.x) {
-        position.x = gameRef.board!.position.x + gameRef.board!.size.x - size.x;
-      } else if (position.y >=
-          gameRef.mapOffset.dy + gameRef.board!.size.y - size.y) {
-        position.y = gameRef.board!.position.y + gameRef.board!.size.y - size.y;
-      }
-    }
+    adjustTankPosition(); // 防止越界的判断处理
   }
 }

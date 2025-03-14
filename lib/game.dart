@@ -10,8 +10,6 @@ import 'package:flutter/services.dart' show LogicalKeyboardKey;
 import 'package:flutter/widgets.dart' show KeyEvent;
 import 'package:flutter_tank_war/board.dart';
 import 'package:flutter_tank_war/tank/base_tank.dart';
-import 'package:flutter_tank_war/tank/enemy_tank.dart';
-import 'package:flutter_tank_war/tank/hero_tank.dart';
 
 /// 游戏类
 class Game extends FlameGame with KeyboardEvents {
@@ -23,9 +21,6 @@ class Game extends FlameGame with KeyboardEvents {
 
   /// 侧边栏的宽度，约为5个gridSize
   late double sideBarWidth;
-
-  /// 英雄坦克对象
-  HeroTank? heroTank;
 
   /// 英雄坦克生命值文本组件
   TextComponent? heroLifeTextComponent;
@@ -51,35 +46,9 @@ class Game extends FlameGame with KeyboardEvents {
         position: mapOffset.toVector2(),
       ),
     );
-    List.generate(
-      4,
-      (index) => add(
-        EnemyTank()
-          ..position =
-              index % 2 == 0
-                  ? Vector2(
-                    mapOffset.dx +
-                        (mapXCount - BaseTank.gridCount) * BaseTank.gridSize,
-                    mapOffset.dy,
-                  )
-                  : mapOffset.toVector2(),
-      ),
-    );
-    add(
-      heroTank = HeroTank(
-        life: 3,
-        position: Vector2(
-          mapOffset.dx +
-              (mapXCount - BaseTank.gridCount) ~/ 2 * BaseTank.gridSize,
-          board!.position.x +
-              board!.size.y -
-              BaseTank.gridSize * BaseTank.gridCount,
-        ),
-      ),
-    );
     add(
       heroLifeTextComponent = TextComponent(
-        text: "Life: ${heroTank!.life}",
+        text: "Life: ${board?.heroTank?.life}",
         textRenderer: TextPaint(
           style: TextStyle(
             fontFamily: 'NotoSans SC',
@@ -93,7 +62,7 @@ class Game extends FlameGame with KeyboardEvents {
 
   /// 游戏结束
   void gameOver() {
-    heroTank = null;
+    board?.heroTank = null;
     debugPrint('game over');
     add(
       RectangleComponent(size: size, paint: Paint()..color = Colors.red)
@@ -116,7 +85,7 @@ class Game extends FlameGame with KeyboardEvents {
     KeyEvent event,
     Set<LogicalKeyboardKey> keysPressed,
   ) {
-    if (heroTank?.handleKeyEvent(event, keysPressed) ==
+    if (board?.heroTank?.handleKeyEvent(event, keysPressed) ==
         KeyEventResult.handled) {
       return KeyEventResult.handled;
     }
