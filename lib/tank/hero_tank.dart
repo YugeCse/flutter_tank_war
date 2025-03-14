@@ -2,8 +2,7 @@ import 'dart:async';
 
 import 'package:flame/game.dart' show Vector2;
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart'
-    show KeyDownEvent, KeyUpEvent, LogicalKeyboardKey;
+import 'package:flutter/services.dart' show KeyDownEvent, LogicalKeyboardKey;
 import 'package:flutter_tank_war/data/move_direction.dart';
 import 'package:flutter_tank_war/tank/bullet.dart';
 import 'package:flutter_tank_war/tank/base_tank.dart';
@@ -22,26 +21,15 @@ class HeroTank extends BaseTank {
     [0, 1, 1, 1, 1, 2, 0, 1, 1], //左
   ];
 
-  /// 玩家按下的键
-  final Set<LogicalKeyboardKey> _playerPressedKeys = {};
-
-  /// 判断玩家是否按下了某些键
-  bool _isKeysPressed(Set<LogicalKeyboardKey> keys) =>
-      _playerPressedKeys.intersection(keys).isNotEmpty;
-
   /// 判断新的移动方向是否会与其他敌人坦克碰撞
-  /// - [dt] 时间间隔, 用于计算这个时间间隔移动的距离
   /// - [targetDirection] 目标方向，用于判断新的移动方向是否会与其他敌人坦克碰撞
-  bool _isCollideWithEnemyTanks({
-    required double dt,
-    required Vector2 targetDirection,
-  }) {
+  bool _isCollideWithEnemyTanks({required Vector2 targetDirection}) {
     var enemyTanks = gameRef.children.whereType<EnemyTank>();
     var targetCells = tankCells[targetDirection.toCellShapeIndex()];
     return enemyTanks.any(
       (el) => el.isCollideWithTankCells(
         tankCells: targetCells,
-        offset: position + targetDirection * speed * dt,
+        offset: position + targetDirection,
       ),
     );
   }
@@ -50,50 +38,6 @@ class HeroTank extends BaseTank {
   FutureOr<void> onLoad() async {
     direction = MoveDirection.up;
     currentTankCells = tankCells[direction.toCellShapeIndex()];
-  }
-
-  @override
-  void update(double dt) {
-    super.update(dt);
-    if (_isKeysPressed({LogicalKeyboardKey.keyW, LogicalKeyboardKey.arrowUp}) &&
-        !_isCollideWithEnemyTanks(dt: dt, targetDirection: MoveDirection.up)) {
-      direction = MoveDirection.up;
-      currentTankCells = tankCells[direction.toCellShapeIndex()];
-      position += direction * speed * dt;
-    } else if (_isKeysPressed({
-          LogicalKeyboardKey.keyD,
-          LogicalKeyboardKey.arrowRight,
-        }) &&
-        !_isCollideWithEnemyTanks(
-          dt: dt,
-          targetDirection: MoveDirection.right,
-        )) {
-      direction = MoveDirection.right;
-      currentTankCells = tankCells[direction.toCellShapeIndex()];
-      position += direction * speed * dt;
-    } else if (_isKeysPressed({
-          LogicalKeyboardKey.keyS,
-          LogicalKeyboardKey.arrowDown,
-        }) &&
-        !_isCollideWithEnemyTanks(
-          dt: dt,
-          targetDirection: MoveDirection.down,
-        )) {
-      direction = MoveDirection.down;
-      currentTankCells = tankCells[direction.toCellShapeIndex()];
-      position += direction * speed * dt;
-    } else if (_isKeysPressed({
-          LogicalKeyboardKey.keyA,
-          LogicalKeyboardKey.arrowLeft,
-        }) &&
-        !_isCollideWithEnemyTanks(
-          dt: dt,
-          targetDirection: MoveDirection.left,
-        )) {
-      direction = MoveDirection.left;
-      currentTankCells = tankCells[direction.toCellShapeIndex()];
-      position += direction * speed * dt;
-    }
   }
 
   /// 处理键盘事件
@@ -108,20 +52,51 @@ class HeroTank extends BaseTank {
         return KeyEventResult.handled;
       }
       if (keysPressed.intersection({
-        LogicalKeyboardKey.keyW,
-        LogicalKeyboardKey.keyA,
-        LogicalKeyboardKey.keyS,
-        LogicalKeyboardKey.keyD,
-        LogicalKeyboardKey.arrowUp,
-        LogicalKeyboardKey.arrowLeft,
-        LogicalKeyboardKey.arrowDown,
-        LogicalKeyboardKey.arrowRight,
-      }).isNotEmpty) {
-        _playerPressedKeys.addAll(keysPressed); // 添加按下的键
-        return KeyEventResult.handled;
+            LogicalKeyboardKey.keyW,
+            LogicalKeyboardKey.arrowUp,
+          }).isNotEmpty &&
+          !_isCollideWithEnemyTanks(targetDirection: MoveDirection.up)) {
+        if (direction != MoveDirection.up) {
+          direction = MoveDirection.up;
+          currentTankCells = tankCells[direction.toCellShapeIndex()];
+          return KeyEventResult.handled;
+        }
+        position += direction * BaseTank.gridSize;
+      } else if (keysPressed.intersection({
+            LogicalKeyboardKey.keyD,
+            LogicalKeyboardKey.arrowRight,
+          }).isNotEmpty &&
+          !_isCollideWithEnemyTanks(targetDirection: MoveDirection.right)) {
+        if (direction != MoveDirection.right) {
+          direction = MoveDirection.right;
+          currentTankCells = tankCells[direction.toCellShapeIndex()];
+          return KeyEventResult.handled;
+        }
+        position += direction * BaseTank.gridSize;
+      } else if (keysPressed.intersection({
+            LogicalKeyboardKey.keyS,
+            LogicalKeyboardKey.arrowDown,
+          }).isNotEmpty &&
+          !_isCollideWithEnemyTanks(targetDirection: MoveDirection.down)) {
+        if (direction != MoveDirection.down) {
+          direction = MoveDirection.down;
+          currentTankCells = tankCells[direction.toCellShapeIndex()];
+          return KeyEventResult.handled;
+        }
+        position += direction * BaseTank.gridSize;
+      } else if (keysPressed.intersection({
+            LogicalKeyboardKey.keyA,
+            LogicalKeyboardKey.arrowLeft,
+          }).isNotEmpty &&
+          !_isCollideWithEnemyTanks(targetDirection: MoveDirection.left)) {
+        if (direction != MoveDirection.left) {
+          direction = MoveDirection.left;
+          currentTankCells = tankCells[direction.toCellShapeIndex()];
+          return KeyEventResult.handled;
+        }
+        position += direction * BaseTank.gridSize;
       }
-    } else if (event is KeyUpEvent) {
-      _playerPressedKeys.remove(event.logicalKey); // 移除松开的键
+      return KeyEventResult.handled;
     }
     return KeyEventResult.ignored;
   }

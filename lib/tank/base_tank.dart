@@ -139,14 +139,18 @@ abstract class BaseTank extends PositionComponent with HasGameRef<Game> {
   void update(double dt) {
     super.update(dt);
     // 防止越界的判断处理
-    if (position.x < 0) {
-      position.x = 0;
-    } else if (position.y < 0) {
-      position.y = 0;
-    } else if (position.x > gameRef.size.x - size.x) {
-      position.x = gameRef.size.x - size.x;
-    } else if (position.y > gameRef.size.y - size.y) {
-      position.y = gameRef.size.y - size.y;
+    if (gameRef.board != null) {
+      if (position.x <= gameRef.mapOffset.dx) {
+        position.x = gameRef.mapOffset.dx;
+      } else if (position.y <= gameRef.mapOffset.dy) {
+        position.y = game.mapOffset.dy;
+      } else if (position.x >=
+          gameRef.mapOffset.dx + gameRef.board!.size.x - size.x) {
+        position.x = gameRef.board!.position.x + gameRef.board!.size.x - size.x;
+      } else if (position.y >=
+          gameRef.mapOffset.dy + gameRef.board!.size.y - size.y) {
+        position.y = gameRef.board!.position.y + gameRef.board!.size.y - size.y;
+      }
     }
   }
 }
