@@ -72,6 +72,26 @@ class Bullet extends PositionComponent with HasGameRef<Game> {
     return false;
   }
 
+  /// 与障碍物发生碰撞
+  /// 返回值：是否碰撞，碰撞的障碍物索引
+  (bool, int) isCollideWithObstacles(List<int> obstacleCells) {
+    for (var i = 0; i < obstacleCells.length; i++) {
+      var x = i % BaseTank.gridCount;
+      var y = i ~/ BaseTank.gridCount;
+      var value = obstacleCells[i];
+      if (value != 0) {
+        var obstacleCellRect = Vector2(
+          x * BaseTank.gridSize,
+          y * BaseTank.gridSize,
+        ).toPositionedRect(Vector2.all(BaseTank.gridSize));
+        if (obstacleCellRect.overlaps(position.toPositionedRect(size))) {
+          return (true, i);
+        }
+      }
+    }
+    return (false, -1);
+  }
+
   @override
   void update(double dt) {
     super.update(dt);
@@ -81,6 +101,9 @@ class Bullet extends PositionComponent with HasGameRef<Game> {
         position.y > gameRef.size.y) {
       removeFromParent(); //超出屏幕边界，从父组件中移除
     } else {
+      var obstacles = gameRef.board?.obstacles ?? [];
+
+      ///TODO 只计算其前后左右的几个障碍物的坐标和碰撞检测
       var allBullets = gameRef.board?.children.whereType<Bullet>() ?? [];
       for (var bullet in allBullets) {
         if (bullet != this &&

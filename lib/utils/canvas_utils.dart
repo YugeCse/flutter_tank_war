@@ -70,4 +70,29 @@ extension CanvasUtils on Canvas {
     path.close();
     drawPath(path, paint); // 绘制路径
   }
+
+  /// 绘制Cell图像
+  /// - [cellSize] 格子大小
+  static Future<Image> createCellImage({
+    required double size,
+    required Color renderColor,
+    double radius = 3.0,
+    double margin = 1.5,
+    double strokeWidth = 1.2,
+    Offset offset = Offset.zero,
+  }) {
+    var pictureRecorder = PictureRecorder();
+    var canvas = Canvas(pictureRecorder);
+    canvas.drawCell(
+      col: 0,
+      row: 0,
+      cellSize: size,
+      radius: radius,
+      margin: margin,
+      offset: offset,
+      strokeWidth: strokeWidth,
+      renderColor: renderColor,
+    );
+    return pictureRecorder.endRecording().toImage(size.toInt(), size.toInt());
+  }
 }

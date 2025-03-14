@@ -81,6 +81,12 @@ class Game extends FlameGame with KeyboardEvents {
   }
 
   @override
+  void update(double dt) {
+    super.update(dt);
+    heroLifeTextComponent?.text = "Life: ${board?.heroTank?.life}";
+  }
+
+  @override
   KeyEventResult onKeyEvent(
     KeyEvent event,
     Set<LogicalKeyboardKey> keysPressed,

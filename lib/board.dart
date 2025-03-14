@@ -24,6 +24,12 @@ class Board extends PositionComponent {
   /// 地图Y轴格子数量
   int mapYCount;
 
+  /// 地图格子图像 - 黑色
+  late Image blackCellImage;
+
+  /// 地图格子图像 - 灰色
+  late Image greyCellImage;
+
   /// 静态地图图层
   late Image staticMapImage;
 
@@ -39,7 +45,15 @@ class Board extends PositionComponent {
   @override
   FutureOr<void> onLoad() async {
     debugMode = true;
-    staticMapImage = await generateWarMap();
+    blackCellImage = await CanvasUtils.createCellImage(
+      size: BaseTank.gridSize,
+      renderColor: Colors.black,
+    );
+    greyCellImage = await CanvasUtils.createCellImage(
+      size: BaseTank.gridSize,
+      renderColor: Colors.grey[700]!,
+    );
+    staticMapImage = await generateWarMap(cellImage: greyCellImage);
     List.generate(
       4,
       (index) => add(
@@ -65,18 +79,18 @@ class Board extends PositionComponent {
   }
 
   /// 生成静态地图
-  Future<Image> generateWarMap() async {
+  Future<Image> generateWarMap({required Image cellImage}) async {
     var staticMapPicRecorder = PictureRecorder();
     var staticMapCanvas = Canvas(staticMapPicRecorder);
+    var paint = Paint()..isAntiAlias = true;
     for (var y = 0; y < mapYCount; y++) {
       for (var x = 0; x < mapXCount; x++) {
-        staticMapCanvas.drawCell(
-          col: x,
-          row: y,
-          cellSize: BaseTank.gridSize,
-          renderColor: Colors.grey[600]!,
-        );
+        var coord = Offset(x * BaseTank.gridSize, y * BaseTank.gridSize);
+        staticMapCanvas.drawImage(cellImage, coord, paint);
         if (Random().nextInt(10) % 3 == 0) {
+          if ((x < 3 && y < 3) || (x > mapXCount - 4 && y > mapYCount - 4)) {
+            continue;
+          }
           obstacles.add(ObstacleInfo(x, y, BaseTank.gridSize));
         }
       }
@@ -89,10 +103,10 @@ class Board extends PositionComponent {
 
   @override
   void render(Canvas canvas) {
-    super.render(canvas);
     canvas.drawImage(staticMapImage, Offset.zero, Paint());
+    super.render(canvas);
     for (var i = 0; i < obstacles.length; i++) {
-      obstacles[i].render(canvas);
+      obstacles[i].render(canvas, cellImage: blackCellImage);
     }
   }
 }

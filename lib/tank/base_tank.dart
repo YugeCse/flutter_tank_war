@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:ui';
 
 import 'package:flame/components.dart';
@@ -21,6 +22,8 @@ abstract class BaseTank extends PositionComponent with HasGameRef<Game> {
     size = Vector2.all(gridSize * gridCount);
   }
 
+  late Image cellImage;
+
   /// 坦克的生命值
   int life;
 
@@ -38,6 +41,15 @@ abstract class BaseTank extends PositionComponent with HasGameRef<Game> {
 
   /// 坦克的核心颜色值
   Color heartColor = Colors.transparent;
+
+  @override
+  FutureOr<void> onLoad() async {
+    super.onLoad();
+    cellImage = await CanvasUtils.createCellImage(
+      size: gridSize,
+      renderColor: Colors.black,
+    );
+  }
 
   /// 判断是否与另一个坦克碰撞
   /// - [tank] 另一个坦克
@@ -163,12 +175,8 @@ abstract class BaseTank extends PositionComponent with HasGameRef<Game> {
       int x = i % gridCount;
       int y = i ~/ gridCount;
       int value = currentTankCells[i];
-      canvas.drawCell(
-        col: x,
-        row: y,
-        cellSize: gridSize,
-        renderColor: value != 0 ? Colors.black : Colors.transparent,
-      );
+      if (value <= 0) continue;
+      canvas.drawImage(cellImage, Offset(x * gridSize, y * gridSize), Paint());
     }
   }
 

@@ -36,6 +36,7 @@ class HeroTank extends BaseTank {
 
   @override
   FutureOr<void> onLoad() async {
+    super.onLoad();
     direction = MoveDirection.up;
     currentTankCells = tankCells[direction.toCellShapeIndex()];
   }

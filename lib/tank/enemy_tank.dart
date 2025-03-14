@@ -32,6 +32,7 @@ class EnemyTank extends BaseTank {
 
   @override
   FutureOr<void> onLoad() async {
+    super.onLoad();
     add(
       _timerComponent = TimerComponent(
         repeat: true,
