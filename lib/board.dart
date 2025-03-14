@@ -38,6 +38,7 @@ class Board extends PositionComponent {
 
   @override
   FutureOr<void> onLoad() async {
+    debugMode = true;
     staticMapImage = await generateWarMap();
     List.generate(
       4,

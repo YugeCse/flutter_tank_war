@@ -43,7 +43,7 @@ class EnemyTank extends BaseTank {
       _tvStateComponent = TextComponent(
         text: state.toString(),
         position: position + Vector2(size.x, -12),
-        textRenderer: TextPaint(style: TextStyle(fontSize: 12)),
+        textRenderer: TextPaint(style: TextStyle(fontSize: 11)),
       ),
     );
   }
