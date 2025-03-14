@@ -86,7 +86,7 @@ class EnemyTank extends BaseTank {
       direction = targetDirection; // 如果没有发生碰撞，它的移动方向改变
       currentTankCells = tankCells[direction.toCellShapeIndex()];
       position += moveTargetDistance; // 移动坦克
-      adjustTankPosition(); // 调整坦克位置
+      adjustTankPositionIfOutRange(); // 调整坦克位置
     }
     if (_random.nextDouble() <=
         (state == EnemyState.attack

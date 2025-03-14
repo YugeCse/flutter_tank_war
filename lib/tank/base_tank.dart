@@ -119,18 +119,41 @@ abstract class BaseTank extends PositionComponent with HasGameRef<Game> {
     );
   }
 
-  void adjustTankPosition() {
+  /// 当坦克移动出范围后，调整坦克位置
+  void adjustTankPositionIfOutRange() {
     if (gameRef.board != null) {
       if (position.x <= 0) {
         position.x = 0;
-      } else if (position.y <= 0) {
+      }
+      if (position.y <= 0) {
         position.y = 0;
-      } else if (position.x >= gameRef.board!.size.x - size.x) {
+      }
+      if (position.x >= gameRef.board!.size.x - size.x) {
         position.x = gameRef.board!.size.x - size.x;
-      } else if (position.y >= gameRef.board!.size.y - size.y) {
+      }
+      if (position.y >= gameRef.board!.size.y - size.y) {
         position.y = gameRef.board!.size.y - size.y;
       }
     }
+  }
+
+  /// 判断坦克移动出一段距离，是否抛出屏幕
+  bool testIsOutOfWallRange(Vector2 moveOffset) {
+    if (gameRef.board != null) {
+      if (position.x + moveOffset.x <= 0) {
+        return true;
+      }
+      if (position.y + moveOffset.y <= 0) {
+        return true;
+      }
+      if (position.x >= gameRef.board!.size.x - size.x + moveOffset.x) {
+        return true;
+      }
+      if (position.y >= gameRef.board!.size.y - size.y + moveOffset.y) {
+        return true;
+      }
+    }
+    return false;
   }
 
   @override
@@ -152,6 +175,6 @@ abstract class BaseTank extends PositionComponent with HasGameRef<Game> {
   @override
   void update(double dt) {
     super.update(dt);
-    adjustTankPosition(); // 防止越界的判断处理
+    adjustTankPositionIfOutRange(); // 防止越界的判断处理
   }
 }
